@@ -87,6 +87,10 @@ class DescentMissionArchive {
         $check = array("checkkey" => $i, "checkquestion" => REGISTER_CHECKS[$i][0]);
         if (hasAllPost('uname', 'upass', 'upassc', 'checkkey', 'check')) {
             $this->checkCSRF();
+            if (!ALLOW_REGISTRATIONS) {
+                $this->serveError("403");
+                die();
+            }
             if (!is_numeric($_POST['checkkey'])) {
                 $this->serve("register", $title, $check);
                 die();

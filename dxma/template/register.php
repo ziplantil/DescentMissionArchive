@@ -10,6 +10,9 @@ elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED
 }
 ?>
 <h1>Create account</h1>
+<?php if (!ALLOW_REGISTRATIONS) : ?>
+<p>New user account registration has been disabled by the administrator.</p>
+<?php else : ?>
 <?php if (isset($error)) : ?>
 <p><?= $error ?></p>
 <?php endif; ?>
@@ -51,3 +54,4 @@ elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED
      (may not work if the current instance does not support HTTPS)
     <?php endif; ?>
 </form> 
+<?php endif; ?>

@@ -21,6 +21,9 @@ define('MAXFILESIZE', 50 * MB);
 define('MAXIMGSIZE', 10 * MB);
 // make sure to also adjust PHP max upload size!
 
+// whether new account registrations are allowed
+define('ALLOW_REGISTRATIONS', TRUE);
+
 // results per page
 define('PERPAGE', 25);
 
