@@ -67,6 +67,10 @@ class DatabaseModel {
         return $this->db->query("SELECT * FROM User WHERE id=?", $uid)->one();
     }
 
+    public function getUserByIdLite(int $uid) {
+        return $this->db->query("SELECT id, username FROM User WHERE id=?", $uid)->one();
+    }
+
     public function forgotAllowed($uid, $ticket) {
         if (!is_numeric($uid)) return FALSE;
         $uid = intval($uid);

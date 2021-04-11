@@ -8,6 +8,7 @@ define('FRONTEND', '/dxma');
 // where files will be stored on the disk (under subdirs). no trailing slash
 // make sure to create the directory and ensure that the user under which
 // php is running has write permissions to it
+// note: DXMA does not place dummy index files. the dir might be browseable
 define('FILEPATH', '/home/dxma/files');
 // the above path but from the point of view of the web browser
 // this is NOT relative to FRONTEND. no trailing slash
@@ -54,9 +55,14 @@ define('GAME_ENUM', [["D1", "Descent 1"], ["D2", "Descent 2"], ["D3", "Descent 3
 define('REGISTER_CHECKS', [
     ["The Descent trilogy has ___ (number) games", "3"],
     ["In 2018, a spiritual successor to Descent called ___ was released", "overload"],
-    ["How many degrees of freedom? (as a number)", "6"]
+    ["How many degrees of freedom? (as a number less than one hundred)", "6"],
+    ["How many levels in total in both Descent I and II (not including secret levels or add-ons?)", "51"],
+    ["The first word of the weapon in Descent II that fires bouncing shots?", "phoenix"],
+    ["Descent 3 came out in... (four-digit year)", "1999"],
+    ["The four-letter megacorporation featured in Descent games is?", "ptmc"],
+    ["You should head to the exit after causing the ___ to meltdown", "reactor"]
 ]);
 
-define('DEBUG', 1);
+define('DEBUG', 0);
 
 ?>

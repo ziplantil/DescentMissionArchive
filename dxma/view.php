@@ -198,13 +198,14 @@ class DescentMissionArchive {
             redirect(route("login"));
         $title = "Edit user page";
         $userid = $this->auth->uid;
+        $user = $this->model->getUserById($userid);
         if (!hasAllPost('realname', 'email', 'website', 'description', 'upass', 'upassc')) {
-            $this->serve("usermod", $title, array("user" => $this->auth->user));
+            $this->serve("usermod", $title, array("user" => $user));
         } else {
             $this->checkCSRF();
             $arr = arrayget($_POST, 'realname', 'email', 'website', 'description', 'upass', 'upassc');
             if (!$this->ctrl->editUser($this->auth->uid, $arr, $this->auth))
-                $this->serve("usermod", $title, array("user" => $this->auth->user, "error" => $this->ctrl->error));
+                $this->serve("usermod", $title, array("user" => $user, "error" => $this->ctrl->error));
             else
                 redirect(route("user", array("u" => $this->auth->uid)));
         }

@@ -29,7 +29,7 @@ class AuthSystem {
             $valid = $valid && $now < $expires;
         }
         if ($valid) {
-            $user = $this->model->getUserById($_SESSION['login_uid']);
+            $user = $this->model->getUserByIdLite($_SESSION['login_uid']);
             $valid = $valid && ($user !== NULL);
             if ($valid) {
                 $uname = $user['username'];
