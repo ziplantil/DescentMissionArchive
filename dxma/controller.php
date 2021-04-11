@@ -113,7 +113,7 @@ class DatabaseController {
             return $this->fail("Invalid mission file type. Allowed types are: " . implode(", ", ALLOWED_MISSION_EXTS));
         }
         if ($data['screenshot']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $sname = data['screenshot']['name'];
+            $sname = $data['screenshot']['name'];
             if (empty($sname)) $sname = "image.png";
             $sext = strtolower(getExtension($sname));
             if (!in_array($sext, ALLOWED_SCREENSHOT_EXTS)) {
@@ -163,7 +163,7 @@ class DatabaseController {
         }
         if ($data['screenshot']['size'] > 0) {
             $spath = getScreenshotFilePath($uid, $tempdir, $sname);
-            if (!move_uploaded_file($data['screenshot']['tmp_name'], $fpath)) {
+            if (!move_uploaded_file($data['screenshot']['tmp_name'], $spath)) {
                 deltree(getMissionFilePath($uid, $tempdir));
                 return $this->fail("Could not upload screenshot file");
             }

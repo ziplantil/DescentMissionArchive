@@ -8,13 +8,13 @@ function createIfNotExist(string $path) {
 
 function deltree(string $path) {
     if (is_dir($path)) {
-        $objects = scandir($dir);
+        $objects = scandir($path);
         foreach ($objects as $obj) {
             if ($obj != "." && $obj != "..") {
-                if (is_dir($dir . DIRECTORY_SEPARATOR . $obj) && !is_link($dir . DIRECTORY_SEPARATOR . $obj))
-                    deltree($dir . DIRECTORY_SEPARATOR . $obj);
+                if (is_dir($path . DIRECTORY_SEPARATOR . $obj) && !is_link($path . DIRECTORY_SEPARATOR . $obj))
+                    deltree($path . DIRECTORY_SEPARATOR . $obj);
                 else
-                    unlink($dir . DIRECTORY_SEPARATOR . $obj); 
+                    unlink($path . DIRECTORY_SEPARATOR . $obj); 
             }
         }
         rmdir($path);
@@ -27,7 +27,7 @@ function renameOrMerge(string $src, string $dst) {
     else {
         $objects = scandir($src);
         foreach ($objects as $obj) {
-            if ($src != "." && $src != "..") {
+            if ($obj != "." && $obj != "..") {
                 rename($src . DIRECTORY_SEPARATOR . $obj, $dst . DIRECTORY_SEPARATOR . $obj); 
             }
         }
