@@ -1,0 +1,106 @@
+html, body {
+    background-color: #191919;
+    color: #ccc;
+    font-family: monospace;
+    font-size: 110%;
+}
+input, select, textarea {
+    font-family: monospace;
+    background-color: #292929;
+    border: 1px solid #ccc;
+    color: #ccc;
+}
+input[type="submit"] {
+    padding: 5px 1em;
+}
+input[type="submit"]:active {
+    background: #444;
+}
+.resulttable tr:hover {
+    background: #222;  
+}
+a {
+    color: #8f8;
+}
+a:visited {
+    color: #9c9;
+}
+a:hover {
+    text-decoration: underline;
+}
+body {
+    position: relative;
+}
+.inline {
+    display: inline;
+}
+.missionmaintable img {
+    margin-right: 2em;
+}
+.topbarleft, .footerleft {
+    float: left;
+    text-align: left;
+}
+.topbarright, .footerright {
+    float: right;
+    text-align: right;
+}
+.clear {
+    clear: both;
+}
+table.missionlist {
+    width: 100%;
+}
+.topbar {
+    margin: 5px;
+}
+.footer {
+    color: #777;
+    position: absolute;
+    bottom: 0;
+    left: 0px;
+    right: 0px;
+    font-size: 90%;
+}
+.column-mode {
+    width: 3em;   
+    text-align: center;
+}
+.column-game {
+    width: 3em;
+    text-align: center;
+}
+.column-date, .column-joined {
+    width: 20em;
+    text-align: center;
+}
+.column-user, .column-username {
+    width: 10em;
+}
+.numinput {
+    width: 3em;
+    text-align: right;
+}
+.mission-action {
+    color: #aaa;
+    font-weight: bold;
+}
+.mission-action.mission-action-main {
+    color: #4f4;
+}
+.mission-action.mission-action-danger {
+    color: #c66;
+}
+#search-q {
+    width: 40em;
+}
+#searchform, #searchformreset {
+    display: inline;
+}
+.missionform .textinput {
+    width: 30em;
+}
+#description {
+    width: 40em;
+    height: 10em;
+}
