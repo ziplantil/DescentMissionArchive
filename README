@@ -3,6 +3,7 @@ provides an interface for uploading and searching mission files for Descent game
 
 The program requires PHP 7 as well as MySQL (with InnoDB or a compatible storage engine). When installed,
 the application should be configured by modifying config.php under the config folder.
+You may also want to look at about.php and replace its content with whatever you want.
 
 The code is not the best or cleanest I have written, but it does the job. It follows a
 quasi-MVC structure and uses PHP itself as a templating engine.

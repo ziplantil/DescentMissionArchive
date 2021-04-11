@@ -2,15 +2,15 @@
 <br />
 <div>
 <h1 class="inline"><span><?= htmlspecialchars($m["title"]) ?></span></h1>
-<i>uploaded by <?= fragment("user", [$m["user"], $m["username"]]) ?></i><br />
+<i>&nbsp;uploaded by <?= fragment("user", [$m["user"], $m["username"]]) ?></i><br />
 </div>
 <p><i>Actions</i> 
-&bullet; <a class="mission-action mission-action-main" href="<?= htmlspecialchars(getMissionFileURL($m["user"], $m["id"], $m["filename"])) ?>" download>Download (<?= formatFileSize(filesize(getMissionFilePath($m["user"], $m["id"], $m["filename"]))) ?>)</a> 
-&bullet; <a class="mission-action" href="<?= route("favorite", ["m" => $m["id"]]) ?>"><?= $fav ? "Unfavorite" : "Favorite" ?></a>
+&bull; <a class="mission-action mission-action-main" href="<?= htmlspecialchars(getMissionFileURL($m["user"], $m["id"], $m["filename"])) ?>" download>Download (<?= formatFileSize(filesize(getMissionFilePath($m["user"], $m["id"], $m["filename"]))) ?>)</a> 
+&bull; <a class="mission-action" href="<?= route("favorite", ["m" => $m["id"]]) ?>"><?= $fav ? "Unfavorite" : "Favorite" ?></a>
 <?php if ($userid == $m["user"]) : ?>
-&bullet; <a class="mission-action" href="<?= route("edit", ["m" => $m["id"]]) ?>">Edit</a>
-&bullet; <a class="mission-action" href="<?= route("update", ["m" => $m["id"]]) ?>">Update</a>
-&bullet; <a class="mission-action mission-action-danger" href="<?= route("delete", ["m" => $m["id"]]) ?>">Delete</a>
+&bull; <a class="mission-action" href="<?= route("edit", ["m" => $m["id"]]) ?>">Edit</a>
+&bull; <a class="mission-action" href="<?= route("update", ["m" => $m["id"]]) ?>">Update</a>
+&bull; <a class="mission-action mission-action-danger" href="<?= route("delete", ["m" => $m["id"]]) ?>">Delete</a>
 <?php endif; ?>
 </p>
 <table class="missionmaintable">
