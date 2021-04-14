@@ -5,15 +5,15 @@ if (!defined('DXMA_VERSION')) {
 
 DEFINE("DBVERSION", 3);
 
-$migrations = array_fill(0, DBVERSION + 1, function ($db) {
-});
+$migrations = array_fill(0, DBVERSION + 1, NULL);
 
 $migrations[0] = function ($db) {
     $db->migrateQuery(<<<'COMMIT'
     CREATE TABLE IF NOT EXISTS SchemaVersion (
         `version` INTEGER PRIMARY KEY NOT NULL
     );
-    COMMIT);
+COMMIT
+);
 };
 
 $migrations[1] = function ($db) {
@@ -65,7 +65,8 @@ $migrations[1] = function ($db) {
     CREATE INDEX idx_user ON User (id);
     CREATE INDEX idx_mission ON Mission (id);
     CREATE INDEX idx_ratings_mission ON Rating (mission);
-    COMMIT);
+COMMIT
+);
 };
 
 $migrations[2] = function ($db) {
@@ -74,7 +75,8 @@ $migrations[2] = function ($db) {
     ADD COLUMN `forgotcode` VARCHAR(32) AFTER email,
     ADD COLUMN `forgotexpiry` TIMESTAMP DEFAULT '0000-00-00 00:00:00' AFTER forgotcode;
     
-    COMMIT);
+COMMIT
+);
 };
 
 $migrations[3] = function ($db) {
@@ -88,7 +90,8 @@ $migrations[3] = function ($db) {
     );
     
     CREATE INDEX idx_author_mission ON Author (mission);
-    COMMIT);
+COMMIT
+);
     $migr = $db->query("SELECT id, author FROM Mission")->all();
     foreach ($migr as &$result) {
         $uid = $db->query("SELECT User.id FROM User WHERE User.username = ?", $result["author"])->one();
