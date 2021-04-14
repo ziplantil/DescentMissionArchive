@@ -12,7 +12,7 @@ if (!$logged_in) {
     <input type="submit" value="Yes">
 </form>
 <br />
-<br />
-<form action="<?= route() ?>">
+<form action="<?= route("mission") ?>">
+    <input type="hidden" name="m" value="<?= $mission['id'] ?>">
     <input type="submit" value="No" />
 </form>
