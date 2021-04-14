@@ -32,8 +32,13 @@
                     <td><?= htmlspecialchars($m["version"]) ?></td>
                 </tr>
                 <tr>
-                    <th>Author</th>
-                    <td><?= htmlspecialchars($m["author"]) ?></td>
+                    <th>Authors</th>
+                    <td>
+                        <?php foreach ($m["authors"] as $i => &$author): ?>
+                            <?= $i > 0 ? "<br />" : "" ?>
+                            <?php fragment("author", $author) ?>
+                        <?php endforeach; ?>
+                    </td>
                 </tr>
                 <tr>
                     <th>Players</th>

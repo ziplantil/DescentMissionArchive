@@ -7,7 +7,7 @@
         <th>For</th>
         <th>Name</th>
         <th>Updated</th>
-        <th>Uploader</th>
+        <th>Author</th>
     </tr>
     <?php if (empty($m)) : ?>
     <tr>

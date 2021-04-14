@@ -16,8 +16,11 @@ input[type="submit"] {
 input[type="submit"]:active {
     background: #444;
 }
+.resulttable tr:nth-child(even) {
+    background: #222; 
+}
 .resulttable tr:hover {
-    background: #222;  
+    background: #333;  
 }
 a {
     color: #8f8;
@@ -106,6 +109,10 @@ table.missionlist {
 }
 .missionform .textinput {
     width: 30em;
+}
+#authors {
+    width: 40em;
+    height: 5em;
 }
 #description {
     width: 40em;

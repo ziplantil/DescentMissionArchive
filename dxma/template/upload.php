@@ -20,9 +20,9 @@ if (!$logged_in) {
             <td><input type="text" id="version" name="version" value="1.0" required></td>
         </tr>
         <tr>
-            <th><label for="author">Author:</label></th>
-            <td><input type="text" class="textinput" id="author" name="author" value=""><br />
-            (empty = you. fill in if you are uploading someone else's work)</td>
+            <th><label for="author">Authors:</label></th>
+            <td><textarea name="authors" id="authors" form="uploadform" maxlength="1024"></textarea><br />
+            One author per line. Prefix line by @ if a DXMA username. Leave empty if only your work</td>
         </tr>
         <tr>
             <th><label for="mode">Mode:</label></th>

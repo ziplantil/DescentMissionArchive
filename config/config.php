@@ -44,7 +44,7 @@ define('PUBLIC_URL', 'https://example.com/dxma/');
 define('CAN_EMAIL', FALSE);
 
 // max length for description
-define('DESC_MAXLENGTH', 1000);
+define('DESC_MAXLENGTH', 2000);
 
 // allowed file extensions for missions
 define('ALLOWED_MISSION_EXTS', ['.zip', '.7z', '.rar', '.gz', '.bz2']);
@@ -63,7 +63,7 @@ define('REGISTER_CHECKS', [
     ["The first word of the weapon in Descent II that fires bouncing shots?", "phoenix"],
     ["Descent 3 came out in... (four-digit year)", "1999"],
     ["The four-letter megacorporation featured in Descent games is?", "ptmc"],
-    ["You should head to the exit after causing the ___ to meltdown", "reactor"]
+    ["You should head to the exit after causing a ___ meltdown", "reactor"]
 ]);
 
 define('DEBUG', 0);

@@ -14,7 +14,7 @@ function prepareSearch(string $q)
     // TODO not inside quotes?
     $q = str_replace("*", "%", $q);
     $q = str_replace("?", "_", $q);
-    return "%" . $q . "%";
+    return $q;
 }
 
 function parseSearchOrder(string $q, bool &$desc)
@@ -40,14 +40,13 @@ class DatabaseModel
     {
         $result = $this->db->query("SELECT version FROM SchemaVersion")->one();
         $this->has_version = !is_null($result);
-        return is_null($result) ? 0 : $result["version"];
+        return is_null($result) ? null : $result["version"];
     }
 
     private function migrate(int $v)
     {
         global $migrations;
-        $stmt = $migrations[$v];
-        $this->db->migrateQuery($stmt);
+        $migrations[$v]($this->db);
     }
     
     private function setVersion(int $v)
@@ -61,8 +60,11 @@ class DatabaseModel
     
     public function prepare()
     {
-        $this->migrate(0);
         $version = $this->version();
+        if (is_null($version)) {
+            $this->migrate(0);
+            $version = 0;
+        }
         $update = $version < DBVERSION;
         while ($version < DBVERSION) {
             $this->migrate(++$version);
@@ -103,9 +105,13 @@ class DatabaseModel
         return hash_equals($user["forgotcode"], $ticket);
     }
     
-    public function getMissionById(int $mid)
+    public function getMissionById(int $mid, bool $getAuthors)
     {
-        return $this->db->query("SELECT Mission.*, User.username as `username` FROM Mission JOIN User ON Mission.user = User.id WHERE Mission.id=?", $mid)->one();
+        $result = $this->db->query("SELECT Mission.*, User.username as `username` FROM Mission JOIN User ON Mission.user = User.id WHERE Mission.id=?", $mid)->one();
+        if ($getAuthors && !is_null($result)) {
+            $result["authors"] = $this->db->query("SELECT Author.name, Author.userid FROM Author WHERE Author.mission=? ORDER BY Author.order ASC", $mid)->all();
+        }
+        return $result;
     }
     
     public function numberOfMembers()
@@ -147,7 +153,7 @@ class DatabaseModel
         $r = array();
         $joins = array();
         $groupby = array();
-        $fields = array("Mission.*", "User.username as `username`");
+        $fields = array("Mission.*", "Author.name AS `authorname`", "Author.userid AS `authoruid`", "COUNT(Author.id) <> 1 AS `multiauthor`");
         $table = "Mission";
         if (!empty($params["favs"])) {
             $table = "Favorite";
@@ -155,15 +161,24 @@ class DatabaseModel
             $r[] = $params["favs"];
             $joins[] = "JOIN Mission ON Favorite.mission = Mission.id";
         }
-        $joins[] = "JOIN User ON Mission.user = User.id";
+        $joins[] = "LEFT JOIN Author ON Mission.id = Author.mission";
+        $groupby[] = "GROUP BY Mission.id";
         $query = "FROM " . $table . " ";
         if (!empty($params["q"])) {
             $wheres[] = "Mission.title LIKE ?";
-            $r[] = prepareSearch($params["q"]);
+            $r[] = prepareSearch("*" . $params["q"] . "*");
         }
         if (!empty($params["user"])) {
             $wheres[] = "Mission.user = ?";
             $r[] = $params["user"];
+        }
+        if (!empty($params["author"])) {
+            $wheres[] = "Author.name LIKE ?";
+            $r[] = prepareSearch($params["author"]);
+        }
+        if (!empty($params["authorid"])) {
+            $wheres[] = "Author.userid = ?";
+            $r[] = $params["authorid"];
         }
         if (!empty($params["players"])) {
             $wheres[] = "Mission.playersMin <= ?";
@@ -194,7 +209,6 @@ class DatabaseModel
                     $divisor = 8;
                     $fields[] = "CASE WHEN COUNT(Rating.rating) = 0 THEN 0 ELSE SUM(Rating.rating - 5) / $divisor * (EXP(COUNT(Rating.rating)) - EXP(-COUNT(Rating.rating))) / (EXP(COUNT(Rating.rating)) + EXP(-COUNT(Rating.rating))) END AS score";
                     $joins[] = "LEFT JOIN Rating ON Mission.id = Rating.mission";
-                    $groupby[] = "GROUP BY Mission.id";
                     $orderby = "score $orderad, Mission.title ASC";
                 } else {
                     $orderby = "Mission.title $orderad";

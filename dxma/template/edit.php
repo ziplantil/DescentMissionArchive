@@ -25,8 +25,19 @@ if (!$logged_in) {
             <td><input type="text" id="version" name="version" value="<?= $mission['version'] ?>" required></td>
         </tr>
         <tr>
-            <th><label for="author">Author:</label></th>
-            <td><input type="text" id="author" name="author" value="<?= $mission['author'] ?>" required></td>
+            <th><label for="author">Authors:</label></th>
+            <td><textarea name="authors" id="authors" form="editform" maxlength="1024"><?php
+                $lines = array();
+                foreach ($mission["authors"] as &$author) {
+                    if (!is_null($author["userid"])) {
+                        $lines[] = "@" . $author["name"];
+                    } else {
+                        $lines[] = $author["name"];
+                    }
+                }
+                echo(implode("\n", $lines));
+            ?></textarea><br />
+            One author per line. Prefix line by @ if a DXMA username</td>
         </tr>
         <tr>
             <th><label for="mode">Mode:</label></th>

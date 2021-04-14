@@ -9,6 +9,10 @@
             <td><input name="q" id="search-q" type="text" value="<?= htmlspecialchars($_GET["q"] ?? "") ?>" maxlength="256" /></td>
         </tr>
         <tr>
+            <th>By author</th>
+            <td><input name="author" id="search-author" type="text" value="<?= htmlspecialchars($_GET["author"] ?? "") ?>" maxlength="256" /> (exact match)</td>
+        </tr>
+        <tr>
             <th>By mode</th>
             <td>
                 <?php foreach (MODE_ENUM as $i => &$mode): ?>

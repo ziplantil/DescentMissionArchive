@@ -18,6 +18,23 @@ function getExtension(string $fn)
     return isset($info['extension']) ? '.' . $info['extension'] : '';
 }
 
+function parseAuthors(string $authors)
+{
+    $list = explode("\n", trim($authors));
+    $result = array();
+    foreach ($list as $author) {
+        if (empty($author)) {
+            continue;
+        }
+        if ($author[0] == "@") {
+            $result[] = [true, trim(substr($author, 1))];
+        } else {
+            $result[] = [null, trim($author)];
+        }
+    }
+    return $result;
+}
+
 function swap(&$x, &$y)
 {
     $tmp = $x;
@@ -75,11 +92,11 @@ class DatabaseController
 
         if (!empty($data["upass"])) {
             if ($data["upass"] !== ($data["upassc"] ?? "")) {
-                return fail("passwords do not match");
+                return $this->fail("passwords do not match");
             }
             $phash = $auth->changePassword($uid, $data["upass"]);
             if (!$this->db->execute("UPDATE User SET passhash=?, forgotcode=NULL WHERE id=?", $phash, $uid)) {
-                return fail("Could not update user");
+                return $this->fail("Could not update user");
             }
         }
 
@@ -91,7 +108,7 @@ class DatabaseController
             $desc,
             $uid
         )) {
-            return fail("Could not update user");
+            return $this->fail("Could not update user");
         }
         return true;
     }
@@ -174,16 +191,19 @@ class DatabaseController
         if (empty($version)) {
             return $this->fail("Empty version not permitted");
         }
-        $author = $data["author"];
-        if (empty($author)) {
-            $author = $uname;
+        $authors = parseAuthors($data["authors"]);
+        if (empty($authors)) {
+            $authors[] = [$uid, $uname];
+        }
+        if (count($authors) > 25) {
+            return $this->fail("Too many authors (max 25). List more authors in the description if necessary!");
         }
         $desc = $data["description"];
         if (empty($desc)) {
             $desc = "";
         }
         if (strlen($desc) > DESC_MAXLENGTH) {
-            return fail("Description is too long");
+            return $this->fail("Description is too long");
         }
         $mode = $data["mode"];
         if (!is_numeric($mode)) {
@@ -211,19 +231,19 @@ class DatabaseController
         }
         $playersMin = $data["playersMin"];
         if (!is_numeric($playersMin)) {
-            return fail("Invalid player count");
+            return $this->fail("Invalid player count");
         }
         $playersMin = intval($playersMin);
         if ($playersMin < 1 || $playersMin > 255) {
-            return fail("Invalid player count");
+            return $this->fail("Invalid player count");
         }
         $playersMax = $data["playersMax"];
         if (!is_numeric($playersMax)) {
-            return fail("Invalid player count");
+            return $this->fail("Invalid player count");
         }
         $playersMax = intval($playersMax);
         if ($playersMax < 1 || $playersMax > 255) {
-            return fail("Invalid player count");
+            return $this->fail("Invalid player count");
         }
         if ($playersMin > $playersMax) {
             swap($playersMin, $playersMax);
@@ -231,6 +251,24 @@ class DatabaseController
         $released = $data["released"];
         if (empty($released) || !validateDate($released)) {
             $released = date("Y-m-d");
+        }
+        
+        $this->db->begin();
+
+        $uids = array();
+        foreach ($authors as &$pair) {
+            if ($pair[0] === true) {
+                $uid = $this->model->getUserByName($pair[1]);
+                if ($uid === null) {
+                    return $this->fail("No user by name '" . $pair[1] . "' exists");
+                }
+                $pair[0] = $uid["id"];
+                if (!is_null($pair[0]) && isset($uids[$pair[0]])) {
+                    $this->db->abort();
+                    return $this->fail("Cannot have dupe author!");
+                }
+                $uids[$pair[0]] = true;
+            }
         }
 
         $tempdir = bin2hex(random_bytes(16));
@@ -247,10 +285,9 @@ class DatabaseController
         }
 
         $ok = $this->db->execute(
-            "INSERT INTO Mission (title, version, author, user, description, mode, game, levels, playersMin, playersMax, released, filename, screenshot, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now())",
+            "INSERT INTO Mission (title, version, user, description, mode, game, levels, playersMin, playersMax, released, filename, screenshot, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now())",
             $title,
             $version,
-            $author,
             $uid,
             $desc,
             $mode,
@@ -265,11 +302,23 @@ class DatabaseController
         if (!$ok) {
             deltree(getMissionFilePath($uid, $tempdir));
             deltree(getScreenshotFilePath($uid, $tempdir));
+            $this->db->abort();
             return $this->fail("Could not add mission");
         }
+
         $mid = $this->db->newId();
+        foreach ($authors as $i => $author) {
+            if (!$this->db->execute("INSERT INTO Author (`mission`, `name`, `userid`, `order`) VALUES (?, ?, ?, ?)", $mid, $author[1], $author[0], $i + 1)) {
+                deltree(getMissionFilePath($uid, $tempdir));
+                deltree(getScreenshotFilePath($uid, $tempdir));
+                $this->db->abort();
+                return $this->fail("Could not add mission");
+            }
+        }
+
         renameOrMerge(getMissionFilePath($uid, $tempdir), getMissionFilePath($uid, $mid));
         renameOrMerge(getScreenshotFilePath($uid, $tempdir), getScreenshotFilePath($uid, $mid));
+        $this->db->commit();
         return $mid;
     }
 
@@ -277,62 +326,65 @@ class DatabaseController
     {
         $title = trim($data["title"]);
         if (empty($title)) {
-            return fail("Empty title not permitted");
+            return $this->fail("Empty title not permitted");
         }
         $version = $data["version"];
         if (empty($version)) {
-            return fail("Empty version not permitted");
+            return $this->fail("Empty version not permitted");
         }
-        $author = $data["author"];
-        if (empty($author)) {
-            $author = $uname;
+        $authors = parseAuthors($data["authors"]);
+        if (empty($authors)) {
+            $authors[] = [$uid, $uname];
+        }
+        if (count($authors) > 25) {
+            return $this->fail("Too many authors (max 25). List more authors in the description if necessary!");
         }
         $desc = $data["description"];
         if (empty($desc)) {
             $desc = "";
         }
         if (strlen($desc) > DESC_MAXLENGTH) {
-            return fail("Description is too long");
+            return $this->fail("Description is too long");
         }
         $mode = $data["mode"];
         if (!is_numeric($mode)) {
-            return fail("Invalid mode");
+            return $this->fail("Invalid mode");
         }
         $mode = intval($mode);
         if (!isset(MODE_ENUM[$mode])) {
-            return fail("Invalid mode");
+            return $this->fail("Invalid mode");
         }
         $game = $data["game"];
         if (!is_numeric($game)) {
-            return fail("Invalid game");
+            return $this->fail("Invalid game");
         }
         $game = intval($game);
         if (!isset(GAME_ENUM[$game])) {
-            return fail("Invalid game");
+            return $this->fail("Invalid game");
         }
         $levels = $data["levels"];
         if (!is_numeric($levels)) {
-            return fail("Invalid level count");
+            return $this->fail("Invalid level count");
         }
         $levels = intval($levels);
         if ($levels < 1 || $levels > 255) {
-            return fail("Invalid level count");
+            return $this->fail("Invalid level count");
         }
         $playersMin = $data["playersMin"];
         if (!is_numeric($playersMin)) {
-            return fail("Invalid player count");
+            return $this->fail("Invalid player count");
         }
         $playersMin = intval($playersMin);
         if ($playersMin < 1 || $playersMin > 255) {
-            return fail("Invalid player count");
+            return $this->fail("Invalid player count");
         }
         $playersMax = $data["playersMax"];
         if (!is_numeric($playersMax)) {
-            return fail("Invalid player count");
+            return $this->fail("Invalid player count");
         }
         $playersMax = intval($playersMax);
         if ($playersMax < 1 || $playersMax > 255) {
-            return fail("Invalid player count");
+            return $this->fail("Invalid player count");
         }
         if ($playersMin > $playersMax) {
             swap($playersMin, $playersMax);
@@ -344,19 +396,48 @@ class DatabaseController
 
         $arr = array();
 
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if (is_null($mission)) {
-            return fail("No such mission");
+            return $this->fail("No such mission");
         }
         if ($mission["user"] !== $uid) {
-            return fail("Not permitted");
+            return $this->fail("Not permitted");
+        }
+        
+        $this->db->begin();
+
+        $uids = array();
+        foreach ($authors as &$pair) {
+            if ($pair[0] === true) {
+                $uid = $this->model->getUserByName($pair[1]);
+                if ($uid === null) {
+                    return $this->fail("No user by name '" . htmlspecialchars($pair[1]) . "' exists");
+                }
+                $pair[0] = $uid["id"];
+                if (!is_null($pair[0]) && isset($uids[$pair[0]])) {
+                    $this->db->abort();
+                    return $this->fail("Cannot have dupe author!");
+                }
+                $uids[$pair[0]] = true;
+            }
+        }
+
+        if (!$this->db->execute("DELETE FROM Author WHERE mission = ?", $mid)) {
+            $this->db->abort();
+            return $this->fail("Could not update mission");
+        }
+
+        foreach ($authors as $i => $author) {
+            if (!$this->db->execute("INSERT INTO Author (`mission`, `name`, `userid`, `order`) VALUES (?, ?, ?, ?)", $mid, $author[1], $author[0], $i + 1)) {
+                $this->db->abort();
+                return $this->fail("Could not update mission");
+            }
         }
 
         if (!$this->db->execute(
-            "UPDATE Mission SET title=?, version=?, author=?, description=?, mode=?, game=?, levels=?, playersMin=?, playersMax=?, released=? WHERE id=?",
+            "UPDATE Mission SET title=?, version=?, description=?, mode=?, game=?, levels=?, playersMin=?, playersMax=?, released=? WHERE id=?",
             $title,
             $version,
-            $author,
             $desc,
             $mode,
             $game,
@@ -366,8 +447,10 @@ class DatabaseController
             $released,
             $mid
         )) {
-            return fail("Could not update mission");
+            $this->db->abort();
+            return $this->fail("Could not update mission");
         }
+        $this->db->commit();
         return true;
     }
 
@@ -395,12 +478,12 @@ class DatabaseController
             return $this->fail("Invalid mission file type. Allowed types are: " . implode(", ", ALLOWED_MISSION_EXTS));
         }
         
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if (is_null($mission)) {
-            return fail("No such mission");
+            return $this->fail("No such mission");
         }
         if ($mission["user"] !== $uid) {
-            return fail("Not permitted");
+            return $this->fail("Not permitted");
         }
 
         $fpathold = getMissionFilePath($uid, $mid, $mission['filename']);
@@ -447,12 +530,12 @@ class DatabaseController
             return $this->fail("Invalid screenshot file type. Allowed types are: " . implode(", ", ALLOWED_MISSION_EXTS));
         }
         
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if (is_null($mission)) {
-            return fail("No such mission");
+            return $this->fail("No such mission");
         }
         if ($mission["user"] !== $uid) {
-            return fail("Not permitted");
+            return $this->fail("Not permitted");
         }
 
         $hadscreenshot = !is_null($mission['screenshot']);
@@ -477,12 +560,12 @@ class DatabaseController
 
     public function deleteMissionScreenshot(int $uid, int $mid)
     {
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if ($mission === null) {
-            return fail("No such mission");
+            return $this->fail("No such mission");
         }
         if ($mission["user"] !== $uid) {
-            return fail("Not permitted");
+            return $this->fail("Not permitted");
         }
 
         if (empty($mission['screenshot'])) {
@@ -499,12 +582,12 @@ class DatabaseController
 
     public function deleteMission(int $uid, int $mid)
     {
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if ($mission === null) {
-            return fail("No such mission");
+            return $this->fail("No such mission");
         }
         if ($mission["user"] !== $uid) {
-            return fail("Not permitted");
+            return $this->fail("Not permitted");
         }
 
         $fpath = getMissionFilePath($uid, $mid, $mission['filename']);

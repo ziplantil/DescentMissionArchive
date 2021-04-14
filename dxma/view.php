@@ -59,7 +59,7 @@ class DescentMissionArchive
         if (empty($pagenum)) {
             $pagenum = 1;
         }
-        $array = array("q" => $_GET['q'] ?? '', "page" => $pagenum);
+        $array = array("q" => $_GET['q'] ?? '', "author" => $_GET['author'] ?? '', "page" => $pagenum);
         $total = 0;
         if (isset($_GET["mode"])) {
             $array["modes"] = getNumberArray($_GET["mode"]);
@@ -179,7 +179,7 @@ class DescentMissionArchive
         if (is_null($mid)) {
             return $this->serveError("404");
         }
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, true);
         if (is_null($mission)) {
             return $this->serveError("404");
         }
@@ -200,8 +200,9 @@ class DescentMissionArchive
             return $this->serveError("404");
         }
         $missions = $this->model->searchMissions([ "user" => $uid ]);
+        $authoredMissions = $this->model->searchMissions([ "authorid" => $uid ]);
         $title = "User: " . $user["username"];
-        $this->serve("user", $title, array("u" => $user, "missions" => $missions));
+        $this->serve("user", $title, array("u" => $user, "missions" => $missions, "authoredMissions" => $authoredMissions));
     }
     
     public function addMissionPage()
@@ -210,7 +211,7 @@ class DescentMissionArchive
         if (!$this->auth->ok) {
             redirect(route("login"));
         }
-        if (!hasAllPost('title', 'version', 'description', 'author', 'game', 'mode', 'levels', 'playersMin', 'playersMax', 'released')) {
+        if (!hasAllPost('title', 'version', 'description', 'authors', 'game', 'mode', 'levels', 'playersMin', 'playersMax', 'released')) {
             $arr = array();
             if (isset($_GET["upload"])) {
                 $arr['error'] = "One of your files was too large";
@@ -218,7 +219,7 @@ class DescentMissionArchive
             $this->serve("upload", $title, $arr);
         } else {
             $this->checkCSRF();
-            $arr = array_merge(arrayget($_POST, 'title', 'version', 'description', 'author', 'game', 'mode', 'levels', 'playersMin', 'playersMax', 'released'), arrayget($_FILES, 'file', 'screenshot'));
+            $arr = array_merge(arrayget($_POST, 'title', 'version', 'description', 'authors', 'game', 'mode', 'levels', 'playersMin', 'playersMax', 'released'), arrayget($_FILES, 'file', 'screenshot'));
             $mid = $this->ctrl->createMission($this->auth->uid, $this->auth->uname, $arr);
             if (is_null($mid)) {
                 $this->serve("upload", $title, array("error" => $this->ctrl->error));
@@ -272,7 +273,7 @@ class DescentMissionArchive
         if (is_null($mid)) {
             return $this->serveError("404");
         }
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, true);
         if (is_null($mission)) {
             return $this->serveError("404");
         }
@@ -281,11 +282,11 @@ class DescentMissionArchive
         }
         
         $title = "Edit mission: " . $mission["title"];
-        if (!hasAllPost('title', 'version', 'author', 'description', 'game', 'mode', 'levels', 'playersMin', 'playersMax', 'released')) {
+        if (!hasAllPost('title', 'version', 'authors', 'description', 'game', 'mode', 'levels', 'playersMin', 'playersMax', 'released')) {
             $this->serve("edit", $title, array("mission" => $mission));
         } else {
             $this->checkCSRF();
-            $arr = arrayget($_POST, 'title', 'version', 'author', 'description', 'game', 'mode', 'levels', 'playersMin', 'playersMax', 'released');
+            $arr = arrayget($_POST, 'title', 'version', 'authors', 'description', 'game', 'mode', 'levels', 'playersMin', 'playersMax', 'released');
             if (!$this->ctrl->editMission($this->auth->uid, $mid, $this->auth->uname, $arr)) {
                 $this->serve("edit", $title, array("mission" => $mission, "error" => $this->ctrl->error));
             } else {
@@ -303,7 +304,7 @@ class DescentMissionArchive
         if (is_null($mid)) {
             return $this->serveError("404");
         }
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if (is_null($mission)) {
             return $this->serveError("404");
         }
@@ -346,7 +347,7 @@ class DescentMissionArchive
         if (is_null($mid)) {
             return $this->serveError("404");
         }
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if (is_null($mission)) {
             return $this->serveError("404");
         }
@@ -372,7 +373,7 @@ class DescentMissionArchive
         if (is_null($mid)) {
             return $this->serveError("404");
         }
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if (is_null($mission)) {
             return $this->serveError("404");
         }
@@ -406,7 +407,7 @@ class DescentMissionArchive
         if (is_null($mid)) {
             return $this->serveError("404");
         }
-        $mission = $this->model->getMissionById($mid);
+        $mission = $this->model->getMissionById($mid, false);
         if (is_null($mission)) {
             return $this->serveError("404");
         }

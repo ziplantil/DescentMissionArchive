@@ -22,6 +22,13 @@
     </tr>
     <?php endif; ?>
 </table>
+<?php if (!empty($authoredMissions)) : ?>
+<hr />
+<h2>Authored missions</h2>
+<?= fragment("list", $authoredMissions) ?>
+<?php endif; ?>
+<?php if (!empty($missions)) : ?>
 <hr />
 <h2>Uploaded missions</h2>
 <?= fragment("list", $missions) ?>
+<?php endif; ?>
