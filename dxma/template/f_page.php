@@ -2,5 +2,5 @@
 <?php if ($m["m"] == $m["n"]) : ?>
 <b><?= $m["t"] ?></b>
 <?php else : ?>
-<a href="?page=<?= $m["m"] + 1 ?>"><?= $m["t"] ?></a>
+<a href="<?= routePage($m["m"] + 1) ?>"><?= $m["t"] ?></a>
 <?php endif; ?>

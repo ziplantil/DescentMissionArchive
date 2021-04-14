@@ -13,6 +13,11 @@ function route(string $name = '', array $args = []) {
     return FRONTEND . $path . $query;
 }
 
+function routePage(int $page) {
+    $params = array_merge($_GET, array('page' => $page));
+    return '.?' . http_build_query($params);
+}
+
 function fragment(string $fragment, $m) {
     require "template/f_$fragment.php";
 }
