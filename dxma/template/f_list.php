@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
 <table class="missionlist resulttable">
     <tr>
         <th>Mode</th>
@@ -12,7 +14,7 @@
         <td colspan="5"><em>No missions found</em><td>
     </tr>
     <?php else : ?>
-    <?php foreach($m as $i => &$mission): ?>
+    <?php foreach ($m as $i => &$mission): ?>
         <?php fragment("mission", $mission) ?>
     <?php endforeach; ?>
     <?php endif; ?>

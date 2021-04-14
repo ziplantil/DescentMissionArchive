@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
 <?php if ($m["count"] > 0) : ?>
 <?php fragment("page", [ "m" => 0, "n" => $m["num"] - 1, "t" => "<<" ]) ?>
 <?php fragment("page", [ "m" => max($m["num"] - 2, 0), "n" => $m["num"] - 1, "t" => "<" ]) ?>

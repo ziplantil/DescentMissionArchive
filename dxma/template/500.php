@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); 
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+}
 http_response_code(500);
 ?>
 <!DOCTYPE html>

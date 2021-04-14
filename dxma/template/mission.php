@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
 <br />
 <div>
 <h1 class="inline"><span><?= htmlspecialchars($m["title"]) ?></span></h1>
@@ -93,4 +95,7 @@
         </td>
     </tr>
 </table>
+<?php if (!empty($m["description"])) : ?>
+<h2>Mission notes</h2>
 <pre><?= $m["description"] ?></pre>
+<?php endif; ?>

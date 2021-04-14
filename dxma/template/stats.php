@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
 <h1>Statistics</h1>
 <table>
     <tr>

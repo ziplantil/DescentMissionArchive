@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
 <h2>Search</h2>
 <form action="." method="get" id="searchform">
     <table>
@@ -9,7 +11,7 @@
         <tr>
             <th>By mode</th>
             <td>
-                <?php foreach(MODE_ENUM as $i => &$mode): ?>
+                <?php foreach (MODE_ENUM as $i => &$mode): ?>
                 <input type="checkbox" id="mode<?= $i ?>" name="mode[]" value="<?= $i ?>" <?= in_array($i, $_GET["mode"] ?? []) ? "checked" : "" ?>>
                 <label for="mode<?= $i ?>"><?= $mode[1] ?></label>
                 <?php endforeach; ?>
@@ -18,7 +20,7 @@
         <tr>
             <th>By game</th>
             <td>
-                <?php foreach(GAME_ENUM as $i => &$game): ?>
+                <?php foreach (GAME_ENUM as $i => &$game): ?>
                 <input type="checkbox" id="game<?= $i ?>" name="game[]" value="<?= $i ?>" <?= in_array($i, $_GET["game"] ?? []) ? "checked" : "" ?>>
                 <label for="game<?= $i ?>"><?= $game[1] ?></label>
                 <?php endforeach; ?>

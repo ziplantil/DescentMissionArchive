@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
 <?php if ($m["m"] == $m["n"]) : ?>
 <b><?= $m["t"] ?></b>
 <?php else : ?>

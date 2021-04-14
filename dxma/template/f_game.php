@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die();
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+}
 $pair = isset(GAME_ENUM[$m["i"]]) ? GAME_ENUM[$m["i"]] : ["??", "??"];
 ?>
 <?php if ($m["full"]) : ?>

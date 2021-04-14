@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
 <tr>
     <td nowrap class="column-mode"><?= fragment("mode", ["i" => $m["mode"], "full" => 0]) ?></td>
     <td nowrap class="column-game"><?= fragment("game", ["i" => $m["game"], "full" => 0]) ?></td>

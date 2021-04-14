@@ -1,5 +1,7 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
-<h1>User: <?= fragment("user", [NULL, $u["username"]]) ?></h1>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
+<h1>User: <?= fragment("user", [null, $u["username"]]) ?></h1>
 <table>
     <?php if (!empty($u["realname"])) : ?>
     <tr>

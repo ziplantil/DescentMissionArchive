@@ -1,5 +1,7 @@
 <?php
-if (!defined('DXMA_VERSION')) die();
+if (!defined('DXMA_VERSION')) {
+    die();
+}
 
 DEFINE("DBVERSION", 2);
 
@@ -67,5 +69,3 @@ ADD COLUMN `forgotcode` VARCHAR(32) AFTER email,
 ADD COLUMN `forgotexpiry` TIMESTAMP DEFAULT '0000-00-00 00:00:00' AFTER forgotcode;
 
 COMMIT;
-
-?>

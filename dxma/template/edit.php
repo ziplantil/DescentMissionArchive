@@ -1,5 +1,9 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
-<?php if (!$logged_in) redirect(route()); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+}
+if (!$logged_in) {
+    redirect(route());
+} ?>
 <h1>Edit mission: <?= htmlspecialchars($mission['title']) ?></h1>
 <?php if (isset($error)) : ?>
 <p><?= $error ?></p>
@@ -28,7 +32,7 @@
             <th><label for="mode">Mode:</label></th>
             <td>
                 <select name="mode" id="mode" form="editform" required value="<?= $mission['mode'] ?>">
-                    <?php foreach(MODE_ENUM as $i => &$mode): ?>
+                    <?php foreach (MODE_ENUM as $i => &$mode): ?>
                     <option value="<?= $i ?>" <?= $i === $mission['mode'] ? "selected" : "" ?>><?= $mode[1] ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -38,7 +42,7 @@
             <th><label for="game">Game:</label></th>
             <td>
                 <select name="game" id="game" form="editform" required value="<?= $mission['game'] ?>">
-                    <?php foreach(GAME_ENUM as $i => &$game): ?>
+                    <?php foreach (GAME_ENUM as $i => &$game): ?>
                     <option value="<?= $i ?>" <?= $i === $mission['game'] ? "selected" : "" ?>><?= $game[1] ?></option>
                     <?php endforeach; ?>
                 </select>

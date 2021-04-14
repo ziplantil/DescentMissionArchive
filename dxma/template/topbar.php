@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
         <div id="topbar">
             <span class="topbarleft">
                 <p><a href="<?= route() ?>">Descent Mission Archive</a></p>

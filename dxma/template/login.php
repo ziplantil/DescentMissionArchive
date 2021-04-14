@@ -1,11 +1,14 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
-<?php if ($logged_in) redirect(route()); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+}
+if ($logged_in) {
+    redirect(route());
+} ?>
 <?php
 $isSecure = false;
 if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
     $isSecure = true;
-}
-elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
+} elseif (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') {
     $isSecure = true;
 }
 ?>

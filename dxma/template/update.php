@@ -1,5 +1,9 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
-<?php if (!$logged_in) redirect(route()); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+}
+if (!$logged_in) {
+    redirect(route());
+} ?>
 <h1>Update mission: <?= htmlspecialchars($mission['title']) ?></h1>
 <?php if (isset($error)) : ?>
 <p><?= $error ?></p>

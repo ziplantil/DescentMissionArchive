@@ -1,4 +1,6 @@
-<?php if (!defined('DXMA_VERSION')) die();
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+}
 $pair = isset(MODE_ENUM[$m["i"]]) ? MODE_ENUM[$m["i"]] : ["??", "??"];
 ?>
 <?php if ($m["full"]) : ?>

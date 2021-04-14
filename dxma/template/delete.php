@@ -1,5 +1,9 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
-<?php if (!$logged_in) redirect(route()); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+}
+if (!$logged_in) {
+    redirect(route());
+} ?>
 <h1>Delete mission: <?= htmlspecialchars($mission['title']) ?></h1>
 <p>Are you sure you want to delete this mission?</p>
 <form action="./?m=<?= $mission['id'] ?>" method="post">

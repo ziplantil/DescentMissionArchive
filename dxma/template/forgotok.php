@@ -1,5 +1,9 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
-<?php if ($logged_in) redirect(route()); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+}
+if ($logged_in) {
+    redirect(route());
+} ?>
 <h1>Forgot password</h1>
 <p>Request sent. If an user account exists by that name and an email address
 has been configured, an email will be sent with further instructions.

@@ -1,5 +1,9 @@
-<?php if (!defined('DXMA_VERSION')) die(); ?>
-<?php if (!$logged_in) redirect(route()); ?>
+<?php if (!defined('DXMA_VERSION')) {
+    die();
+} ?>
+<?php if (!$logged_in) {
+    redirect(route());
+} ?>
 <h1>Edit user: <?= htmlspecialchars($user['username']) ?></h1>
 <?php if (isset($error)) : ?>
 <p><?= $error ?></p>
