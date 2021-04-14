@@ -1,7 +1,7 @@
 <?php
 if (!defined('I_AM_DXMA')) die();
 require_once dirname(__FILE__) . '/../config/config.php';
-define("DXMA_VERSION", "0.3 alpha");
+define("DXMA_VERSION", "0.4 alpha");
 
 if (DEBUG == 1) {
     error_reporting(E_ALL);

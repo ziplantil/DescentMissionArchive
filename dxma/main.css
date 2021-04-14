@@ -66,6 +66,13 @@ table.missionlist {
     width: 3em;   
     text-align: center;
 }
+.resultcountontheright {
+    display: inline;
+}
+.resultcount {
+    color: #999;
+    float: right;
+}
 .column-game {
     width: 3em;
     text-align: center;

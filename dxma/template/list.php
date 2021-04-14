@@ -49,7 +49,10 @@
 <form action="." method="get" id="searchformreset">
     <input type="submit" value="Reset" />
 </form>
-<h2>Mission List</h2>
+<p>
+<h2 class="resultcountontheright">Mission List</h2>
+<i class="resultcount"><?= $total ?> result(s)</i>
+</p>
 <?= fragment("list", $missions) ?>
 <br />
 <?= fragment("pages", [ "num" => $pageNum, "count" => $pageCount ]) ?>

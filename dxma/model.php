@@ -150,8 +150,7 @@ class DatabaseModel {
             $wheres[] = "Mission.game IN (" . implode(",", array_fill(0, count($params["games"]), "?")) . ")";
             $r = array_merge($r, $params["games"]);
         }
-        $orderby = "Mission.title";
-        $orderad = "ASC";
+        $orderby = "Mission.title ASC";
         $desc = false;
         if (!empty($params["order"])) {
             $givenorder = parseSearchOrder($params["order"], $desc);
@@ -159,30 +158,33 @@ class DatabaseModel {
                 $orderad = $desc ? "DESC" : "ASC";
 
                 if ($givenorder === "rdate") {
-                    $orderby = "Mission.released";
+                    $orderby = "Mission.released $orderad";
                 } elseif ($givenorder === "udate") {
-                    $orderby = "Mission.updated";
+                    $orderby = "Mission.updated $orderad";
                 } elseif ($givenorder === "rating") {
                     $divisor = 8;
-                    $fields[] = "IFNULL(SUM(Rating.rating - 5), 0) * (EXP(COUNT(Rating.rating)) - EXP(-COUNT(Rating.rating))) / (EXP(COUNT(Rating.rating)) + EXP(-COUNT(Rating.rating))) / $divisor AS score";
+                    $fields[] = "CASE WHEN COUNT(Rating.rating) = 0 THEN 0 ELSE SUM(Rating.rating - 5) / $divisor * (EXP(COUNT(Rating.rating)) - EXP(-COUNT(Rating.rating))) / (EXP(COUNT(Rating.rating)) + EXP(-COUNT(Rating.rating))) END AS score";
                     $joins[] = "LEFT JOIN Rating ON Mission.id = Rating.mission";
                     $groupby[] = "GROUP BY Mission.id";
-                    $orderby = "score";
-                } // else = name
+                    $orderby = "score $orderad, Mission.title ASC";
+                } else {
+                    $orderby = "Mission.title $orderad";
+                }
             }
         }
         $query .= implode(" ", $joins) . " ";
-        if (!empty($groupby)) {
-            $query .= implode(" ", $groupby) . " ";
-        }
         if (!empty($wheres)) {
             $query .= "WHERE " . implode(" AND ", $wheres) . " ";
         }
 
         $tmpr = array_merge(array("SELECT COUNT(*) AS `count` " . $query), $r);
         $total = call_user_func_array(array($this->db, "query"), $tmpr)->one()['count'];
+        
+        if (!empty($groupby)) {
+            $query .= implode(" ", $groupby) . " ";
+        }
 
-        $query .= "ORDER BY $orderby $orderad ";
+        $query .= "ORDER BY $orderby ";
         $query = "SELECT " . implode(", ", $fields) . " " . $query;
         if (!empty($params["page"])) {
             $page = intval($params["page"]);
@@ -190,8 +192,7 @@ class DatabaseModel {
             $query .= "LIMIT ? OFFSET ?";
             $r[] = PERPAGE;
             $r[] = PERPAGE * $page;
-        }
-        array_unshift($r, $query);
+        }array_unshift($r, $query);
         return call_user_func_array(array($this->db, "query"), $r)->all();
     }
 
