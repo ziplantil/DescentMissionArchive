@@ -22,7 +22,7 @@ if (!$logged_in) {
         <tr>
             <th><label for="author">Authors:</label></th>
             <td><textarea name="authors" id="authors" form="uploadform" maxlength="1024"></textarea><br />
-            One author per line. Prefix line by @ if a DXMA username. Leave empty if only your work</td>
+            One author per line. Prefix line by # if <i>not</i> a DXMA username. Leave empty if only your work</td>
         </tr>
         <tr>
             <th><label for="mode">Mode:</label></th>

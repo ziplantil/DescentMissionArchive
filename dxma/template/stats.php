@@ -8,6 +8,10 @@
         <td><?= $memberTotal ?></td>
     </tr>
     <tr>
+        <th>Number of authors</th>
+        <td><?= $authorTotal ?></td>
+    </tr>
+    <tr>
         <th>Number of missions</th>
         <td><?= $missionTotal ?></td>
     </tr>

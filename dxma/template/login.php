@@ -25,7 +25,7 @@ if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
         </tr>
         <tr>
             <th><label for="upass">Password:</label></th>
-            <td><input type="password" id="upass" name="upass" required></td>
+            <td><input type="password" id="upass" name="upass" required autocomplete="current-password"></td>
         </tr>
         <tr>
             <td colspan="2"><input type="submit" value="Log in"></td>

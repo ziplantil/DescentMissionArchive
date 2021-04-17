@@ -17,9 +17,9 @@ function route(string $name = '', array $args = [])
     return FRONTEND . $path . $query;
 }
 
-function routePage(int $page)
+function routePage(string $name, int $page)
 {
-    $params = array_merge($_GET, array('page' => $page));
+    $params = array_merge($_GET, array($name => $page));
     return '.?' . http_build_query($params);
 }
 

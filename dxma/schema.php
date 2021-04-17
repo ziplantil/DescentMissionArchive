@@ -3,21 +3,23 @@ if (!defined('DXMA_VERSION')) {
     die();
 }
 
-DEFINE("DBVERSION", 3);
+DEFINE("DBVERSION", 4);
 
-$migrations = array_fill(0, DBVERSION + 1, NULL);
+$migrations = array_fill(0, DBVERSION + 1, null);
 
 $migrations[0] = function ($db) {
-    $db->migrateQuery(<<<'COMMIT'
+    $db->migrateQuery(
+        <<<'COMMIT'
     CREATE TABLE IF NOT EXISTS SchemaVersion (
         `version` INTEGER PRIMARY KEY NOT NULL
     );
 COMMIT
-);
+    );
 };
 
 $migrations[1] = function ($db) {
-    $db->migrateQuery(<<<'COMMIT'
+    $db->migrateQuery(
+        <<<'COMMIT'
     CREATE TABLE IF NOT EXISTS `User` (
         `id` INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
         `username` VARCHAR(32) NOT NULL,
@@ -66,21 +68,23 @@ $migrations[1] = function ($db) {
     CREATE INDEX idx_mission ON Mission (id);
     CREATE INDEX idx_ratings_mission ON Rating (mission);
 COMMIT
-);
+    );
 };
 
 $migrations[2] = function ($db) {
-    $db->migrateQuery(<<<'COMMIT'
+    $db->migrateQuery(
+        <<<'COMMIT'
     ALTER TABLE User
     ADD COLUMN `forgotcode` VARCHAR(32) AFTER email,
     ADD COLUMN `forgotexpiry` TIMESTAMP DEFAULT '0000-00-00 00:00:00' AFTER forgotcode;
     
 COMMIT
-);
+    );
 };
 
 $migrations[3] = function ($db) {
-    $db->migrateQuery(<<<'COMMIT'
+    $db->migrateQuery(
+        <<<'COMMIT'
     CREATE TABLE IF NOT EXISTS `Author` (
         `id` INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
         `mission` INTEGER NOT NULL REFERENCES Mission(id) ON DELETE CASCADE,
@@ -91,7 +95,7 @@ $migrations[3] = function ($db) {
     
     CREATE INDEX idx_author_mission ON Author (mission);
 COMMIT
-);
+    );
     $migr = $db->query("SELECT id, author FROM Mission")->all();
     foreach ($migr as &$result) {
         $uid = $db->query("SELECT User.id FROM User WHERE User.username = ?", $result["author"])->one();
@@ -101,4 +105,42 @@ COMMIT
         $db->execute("INSERT INTO `Author` (`mission`, `order`, `name`, `userid`) VALUES (?, 1, ?, ?)", $result["id"], $result["author"], $uid);
     }
     $db->migrateQuery("ALTER TABLE Mission DROP COLUMN `author`");
+};
+
+$migrations[4] = function ($db) {
+    $db->migrateQuery(
+        <<<'COMMIT'
+    ALTER TABLE Author DROP INDEX idx_author_mission;
+    RENAME TABLE Author TO AuthorOld;
+
+    CREATE TABLE IF NOT EXISTS `Author` (
+        `id` INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
+        `name` VARCHAR(128),
+        `userid` INTEGER REFERENCES User(id) ON DELETE SET NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS `MissionAuthor` (
+        `id` INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL,
+        `mission` INTEGER NOT NULL REFERENCES Mission(id) ON DELETE CASCADE,
+        `author` INTEGER NOT NULL REFERENCES Author(id) ON DELETE CASCADE,
+        `order` INTEGER NOT NULL
+    );
+    
+    CREATE INDEX idx_author_mission ON MissionAuthor (mission);
+    CREATE INDEX idx_author_author ON MissionAuthor (author);
+    CREATE INDEX idx_author ON Author (id);
+COMMIT
+    );
+    $migr = $db->query("SELECT * FROM AuthorOld")->all();
+    foreach ($migr as &$result) {
+        $aid = $db->query("SELECT Author.id FROM Author WHERE Author.`name` = ? AND Author.`userid` = ?", $result["name"], $result["userid"])->one();
+        if (!is_null($aid)) {
+            $aid = $aid["id"];
+        } else {
+            $db->execute("INSERT INTO `Author` (`name`, `userid`) VALUES (?, ?)", is_null($result["userid"]) ? $result["name"] : null, $result["userid"]);
+            $aid = $db->newId();
+        }
+        $db->execute("INSERT INTO `MissionAuthor` (`mission`, `author`, `order`) VALUES (?, ?, ?)", $result["mission"], $aid, $result["order"]);
+    }
+    $db->migrateQuery("DROP TABLE AuthorOld");
 };

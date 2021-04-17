@@ -24,11 +24,23 @@
 </table>
 <?php if (!empty($authoredMissions)) : ?>
 <hr />
-<h2>Authored missions</h2>
+<p>
+<h2 class="resultcountontheright">Authored missions</h2>
+<i class="resultcount"><?= $authoredTotal ?> mission(s)</i>
+</p>
 <?= fragment("list", $authoredMissions) ?>
+<br />
+<?= fragment("pages", [ "num" => $authoredPageNum, "count" => $authoredPageCount ]) ?>
+<br />
 <?php endif; ?>
 <?php if (!empty($missions)) : ?>
 <hr />
-<h2>Uploaded missions</h2>
+<p>
+<h2 class="resultcountontheright">Uploaded missions</h2>
+<i class="resultcount"><?= $total ?> mission(s)</i>
+</p>
 <?= fragment("list", $missions) ?>
+<br />
+<?= fragment("pages", [ "num" => $pageNum, "count" => $pageCount, "param" => "upage" ]) ?>
+<br />
 <?php endif; ?>

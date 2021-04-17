@@ -55,10 +55,7 @@ class DescentMissionArchive
     public function mainPage()
     {
         $title = "List";
-        $pagenum = getNumber('page', 0);
-        if (empty($pagenum)) {
-            $pagenum = 1;
-        }
+        $pagenum = getNumber('page', 0) ?: 1;
         $array = array("q" => $_GET['q'] ?? '', "author" => $_GET['author'] ?? '', "page" => $pagenum);
         $total = 0;
         if (isset($_GET["mode"])) {
@@ -199,10 +196,34 @@ class DescentMissionArchive
         if (is_null($user)) {
             return $this->serveError("404");
         }
-        $missions = $this->model->searchMissions([ "user" => $uid ]);
-        $authoredMissions = $this->model->searchMissions([ "authorid" => $uid ]);
+        $total = 0;
+        $authoredTotal = 0;
+        $pagenum = getNumber('upage', 0) ?: 1;
+        $authoredpagenum = getNumber('page', 0) ?: 1;
+        $missions = $this->model->searchMissions([ "user" => $uid, "page" => $pagenum ], $total);
+        $authoredMissions = $this->model->searchMissions([ "authoruserid" => $uid, "page" => $authoredpagenum ], $authoredTotal);
         $title = "User: " . $user["username"];
-        $this->serve("user", $title, array("u" => $user, "missions" => $missions, "authoredMissions" => $authoredMissions));
+        $this->serve("user", $title, array("u" => $user, "missions" => $missions, "authoredMissions" => $authoredMissions, "total" => $total, "pageNum" => $pagenum, "pageCount" => ceil($total / PERPAGE), "authoredTotal" => $authoredTotal, "authoredPageNum" => $authoredpagenum, "authoredPageCount" => ceil($authoredTotal / PERPAGE)));
+    }
+    
+    public function authorPage()
+    {
+        $aid = getNumber('a', null);
+        if (is_null($aid)) {
+            return $this->serveError("404");
+        }
+        $author = $this->model->getAuthorById($aid);
+        if (is_null($author)) {
+            return $this->serveError("404");
+        }
+        if (!is_null($author["userid"])) {
+            redirect(route("user", array("u" => $author["userid"])));
+        }
+        $total = 0;
+        $pagenum = getNumber('upage', 0) ?: 1;
+        $missions = $this->model->searchMissions([ "authorid" => $aid, "page" => $pagenum ], $total);
+        $title = "Author: " . $author["name"];
+        $this->serve("author", $title, array("author" => $author, "missions" => $missions, "total" => $total, "pageNum" => $pagenum, "pageCount" => ceil($total / PERPAGE)));
     }
     
     public function addMissionPage()
@@ -237,11 +258,11 @@ class DescentMissionArchive
         $title = "Edit user page";
         $userid = $this->auth->uid;
         $user = $this->model->getUserById($userid);
-        if (!hasAllPost('realname', 'email', 'website', 'description', 'upass', 'upassc')) {
+        if (!hasAllPost('realname', 'email', 'website', 'description', 'upass', 'upassc', 'cpass')) {
             $this->serve("usermod", $title, array("user" => $user));
         } else {
             $this->checkCSRF();
-            $arr = arrayget($_POST, 'realname', 'email', 'website', 'description', 'upass', 'upassc');
+            $arr = arrayget($_POST, 'realname', 'email', 'website', 'description', 'upass', 'upassc', 'cpass');
             if (!$this->ctrl->editUser($this->auth->uid, $arr, $this->auth)) {
                 $this->serve("usermod", $title, array("user" => $user, "error" => $this->ctrl->error));
             } else {
@@ -389,13 +410,29 @@ class DescentMissionArchive
         if (empty($pagenum)) {
             $pagenum = 1;
         }
-        $array = array("q" => getString('q', 0), "page" => $pagenum);
+        $array = array("q" => getString('q', null), "page" => $pagenum);
         if (!empty($_GET["order"])) {
             $array["order"] = $_GET["order"];
         }
         $total = 0;
         $members = $this->model->searchMembers($array, $total);
         $this->serve("members", $title, array("members" => $members, "total" => $total, "pageNum" => $pagenum, "pageCount" => ceil($total / PERPAGE)));
+    }
+
+    public function authorListPage()
+    {
+        $title = "Author list";
+        $pagenum = getNumber('page', 0);
+        if (empty($pagenum)) {
+            $pagenum = 1;
+        }
+        $array = array("q" => getString('q', null), "page" => $pagenum);
+        if (!empty($_GET["order"])) {
+            $array["order"] = $_GET["order"];
+        }
+        $total = 0;
+        $authors = $this->model->searchAuthors($array, $total);
+        $this->serve("authors", $title, array("authors" => $authors, "total" => $total, "pageNum" => $pagenum, "pageCount" => ceil($total / PERPAGE)));
     }
 
     public function rateMission()
@@ -433,6 +470,7 @@ class DescentMissionArchive
         $title = "Statistics";
         $data = array();
         $data["memberTotal"] = $this->model->numberOfMembers();
+        $data["authorTotal"] = $this->model->numberOfAuthors();
         $data["missionTotal"] = $this->model->numberOfMissions();
         $this->serve("stats", $title, $data);
     }

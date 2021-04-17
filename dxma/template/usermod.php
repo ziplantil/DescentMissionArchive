@@ -32,15 +32,25 @@
             <td colspan="2"><input type="submit" value="Edit"><br /><br /></td>
         </tr>
         <tr>
-            <td colspan="2">Use the form below to change the password, or leave it empty to keep as is</td>
+            <td colspan="2"><h3>Change password</h3></td>
         </tr>
         <tr>
-            <th><label for="upass">Change password:</label></th>
-            <td><input type="password" id="upass" name="upass"><br /></td>
+            <td colspan="2">Use the form below to change the password, or leave it empty to keep as is. You must enter the current password in order to change to a new one.</td>
+        </tr>
+        <tr>
+            <td colspan="2"><br></td>
+        </tr>
+        <tr>
+            <th><label for="cpass">Current password:</label></th>
+            <td><input type="password" id="cpass" name="cpass" autocomplete="current-password"><br /></td>
+        </tr>
+        <tr>
+            <th><label for="upass">New password:</label></th>
+            <td><input type="password" id="upass" name="upass" autocomplete="new-password"><br /></td>
         </tr>
         <tr>
             <th><label for="upassc">Confirm:</label></th>
-            <td><input type="password" id="upassc" name="upassc"><br /></td>
+            <td><input type="password" id="upassc" name="upassc" autocomplete="new-password"><br /></td>
         </tr>
     </table>
 </form>

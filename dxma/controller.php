@@ -26,10 +26,10 @@ function parseAuthors(string $authors)
         if (empty($author)) {
             continue;
         }
-        if ($author[0] == "@") {
-            $result[] = [true, trim(substr($author, 1))];
+        if ($author[0] == "#") {
+            $result[] = [null, trim(substr($author, 1))];
         } else {
-            $result[] = [null, trim($author)];
+            $result[] = [true, trim($author)];
         }
     }
     return $result;
@@ -94,6 +94,9 @@ class DatabaseController
             if ($data["upass"] !== ($data["upassc"] ?? "")) {
                 return $this->fail("passwords do not match");
             }
+            if (!$auth->checkPassword($uid, $data["cpass"] ?? "")) {
+                return $this->fail("previous password was wrong");
+            }
             $phash = $auth->changePassword($uid, $data["upass"]);
             if (!$this->db->execute("UPDATE User SET passhash=?, forgotcode=NULL WHERE id=?", $phash, $uid)) {
                 return $this->fail("Could not update user");
@@ -140,6 +143,21 @@ class DatabaseController
             $ticket,
             $uid
         );
+    }
+    
+    public function getOrNewAuthorId(?int $uid, ?string $name)
+    {
+        if (!is_null($uid)) {
+            $name = null;
+        }
+        $result = $this->db->query("SELECT Author.id FROM Author WHERE Author.userid=? OR Author.`name`=?", $uid, $name)->one();
+        if (is_null($result)) {
+            if (!$this->db->execute("INSERT INTO Author (`userid`, `name`) VALUES (?, ?)", $uid, $name)) {
+                return null;
+            }
+            return $this->db->newId();
+        }
+        return $result["id"];
     }
 
     public function createMission(int $uid, string $uname, array $data)
@@ -307,13 +325,24 @@ class DatabaseController
         }
 
         $mid = $this->db->newId();
+        $fail = false;
         foreach ($authors as $i => $author) {
-            if (!$this->db->execute("INSERT INTO Author (`mission`, `name`, `userid`, `order`) VALUES (?, ?, ?, ?)", $mid, $author[1], $author[0], $i + 1)) {
-                deltree(getMissionFilePath($uid, $tempdir));
-                deltree(getScreenshotFilePath($uid, $tempdir));
-                $this->db->abort();
-                return $this->fail("Could not add mission");
+            $aid = $this->getOrNewAuthorId($author[0], $author[1]);
+            if (is_null($aid)) {
+                $fail = true;
+                break;
             }
+            if (!$this->db->execute("INSERT INTO MissionAuthor (`mission`, `author`, `order`) VALUES (?, ?, ?)", $mid, $aid, $i + 1)) {
+                $fail = true;
+                break;
+            }
+        }
+
+        if ($fail) {
+            deltree(getMissionFilePath($uid, $tempdir));
+            deltree(getScreenshotFilePath($uid, $tempdir));
+            $this->db->abort();
+            return $this->fail("Could not add mission");
         }
 
         renameOrMerge(getMissionFilePath($uid, $tempdir), getMissionFilePath($uid, $mid));
@@ -422,16 +451,24 @@ class DatabaseController
             }
         }
 
-        if (!$this->db->execute("DELETE FROM Author WHERE mission = ?", $mid)) {
+        $oldAuthors = array_column($this->db->query("SELECT author FROM MissionAuthor WHERE mission = ?", $mid)->all(), "author");
+        if (!$this->db->execute("DELETE FROM MissionAuthor WHERE mission = ?", $mid)) {
             $this->db->abort();
             return $this->fail("Could not update mission");
         }
 
+        $newAuthors = array();
         foreach ($authors as $i => $author) {
-            if (!$this->db->execute("INSERT INTO Author (`mission`, `name`, `userid`, `order`) VALUES (?, ?, ?, ?)", $mid, $author[1], $author[0], $i + 1)) {
+            $aid = $this->getOrNewAuthorId($author[0], $author[1]);
+            if (is_null($aid)) {
                 $this->db->abort();
                 return $this->fail("Could not update mission");
             }
+            if (!$this->db->execute("INSERT INTO MissionAuthor (`mission`, `author`, `order`) VALUES (?, ?, ?)", $mid, $aid, $i + 1)) {
+                $this->db->abort();
+                return $this->fail("Could not update mission");
+            }
+            $newAuthors[] = $aid;
         }
 
         if (!$this->db->execute(
@@ -451,6 +488,12 @@ class DatabaseController
             return $this->fail("Could not update mission");
         }
         $this->db->commit();
+
+        // try some cleanup
+        if (!empty(array_diff($oldAuthors, $newAuthors))) {
+            $this->db->execute("DELETE a FROM Author a WHERE NOT EXISTS (SELECT mission FROM MissionAuthor WHERE author = a.id)");
+        }
+
         return true;
     }
 

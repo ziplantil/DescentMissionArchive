@@ -149,6 +149,16 @@ class AuthSystem
         return password_hash($upass, PASSWORD_DEFAULT);
     }
 
+    public function checkPassword(int $uid, string $cpass)
+    {
+        $user = $this->model->getUserById($uid);
+        if (is_null($user)) {
+            return false;
+        }
+
+        return password_verify($cpass, $user['passhash']);
+    }
+
     public function login(string $uname, string $upass)
     {
         $user = $this->model->getUserByName($uname);

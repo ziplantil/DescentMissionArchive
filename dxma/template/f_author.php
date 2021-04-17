@@ -4,5 +4,5 @@
 <?php if (!is_null($m["userid"])) : ?>
 <?= fragment("user", [ $m["userid"], $m["name"] ]) ?>
 <?php else : ?>
-<a href="<?= route("", [ "author" => $m["name"] ]) ?>" class="authoralias"><?= htmlspecialchars($m["name"]) ?></a>
+<a href="<?= route("author", [ "a" => $m["id"] ]) ?>" class="authoralias"><?= htmlspecialchars($m["name"]) ?></a>
 <?php endif; ?>

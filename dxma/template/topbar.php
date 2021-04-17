@@ -4,10 +4,10 @@
         <div id="topbar">
             <span class="topbarleft">
                 <p><a href="<?= route() ?>">Descent Mission Archive</a></p>
-                <a href="<?= route() ?>">Home</a><br />
-                <a href="<?= route("about") ?>">About</a><br />
-                <a href="<?= route("members") ?>">Members</a><br />
-                <a href="<?= route("stats") ?>">Statistics</a><br />
+                <a href="<?= route() ?>">Home</a> &bull; <a href="<?= route("about") ?>">About</a><br />
+                <a href="<?= route("members") ?>">Members</a> &bull; <a href="<?= route("authors") ?>">Authors</a><br />
+                <a href="<?= route("stats") ?>">Stats</a><!-- &bull; <a href=""></a>--><br />
+                <!-- <a href=""></a> &bull; <a href=""></a>--><br />
             </span>
             <span class="topbarright">
                 <?php if ($logged_in) : ?>

@@ -51,7 +51,7 @@ body {
 .clear {
     clear: both;
 }
-table.missionlist {
+table.resulttable {
     width: 100%;
 }
 .topbar {
@@ -78,6 +78,10 @@ table.missionlist {
 }
 .column-game {
     width: 3em;
+    text-align: center;
+}
+.column-authorismember {
+    width: 8em;
     text-align: center;
 }
 .column-date, .column-joined {

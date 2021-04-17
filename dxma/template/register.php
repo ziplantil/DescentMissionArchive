@@ -28,11 +28,11 @@ if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
         </tr>
         <tr>
             <th><label for="upass">Password:</label></th>
-            <td><input type="password" id="upass" name="upass" maxlength="240" required></td>
+            <td><input type="password" id="upass" name="upass" maxlength="240" required autocomplete="new-password"></td>
         </tr>
         <tr>
             <th><label for="upassc">Confirm:</label></th>
-            <td><input type="password" id="upassc" name="upassc" maxlength="240" required></td>
+            <td><input type="password" id="upassc" name="upassc" maxlength="240" required autocomplete="new-password"></td>
         </tr>
         <tr>
             <th><label for="email">E-mail:</label></th>

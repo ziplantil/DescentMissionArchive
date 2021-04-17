@@ -88,6 +88,11 @@ class DatabaseModel
     {
         return $this->db->query("SELECT id, username FROM User WHERE id=?", $uid)->one();
     }
+    
+    public function getAuthorById(int $aid)
+    {
+        return $this->db->query("SELECT * FROM Author WHERE id=?", $aid)->one();
+    }
 
     public function forgotAllowed($uid, $ticket)
     {
@@ -109,7 +114,7 @@ class DatabaseModel
     {
         $result = $this->db->query("SELECT Mission.*, User.username as `username` FROM Mission JOIN User ON Mission.user = User.id WHERE Mission.id=?", $mid)->one();
         if ($getAuthors && !is_null($result)) {
-            $result["authors"] = $this->db->query("SELECT Author.name, Author.userid FROM Author WHERE Author.mission=? ORDER BY Author.order ASC", $mid)->all();
+            $result["authors"] = $this->db->query("SELECT Author.id, IFNULL(User.username, Author.`name`) as `name`, Author.userid FROM MissionAuthor JOIN Author ON MissionAuthor.author = Author.id LEFT JOIN User on Author.userid = User.id WHERE MissionAuthor.mission=? ORDER BY MissionAuthor.order ASC", $mid)->all();
         }
         return $result;
     }
@@ -117,6 +122,11 @@ class DatabaseModel
     public function numberOfMembers()
     {
         return $this->db->query("SELECT COUNT(*) AS `count` FROM User")->one()['count'];
+    }
+    
+    public function numberOfAuthors()
+    {
+        return $this->db->query("SELECT COUNT(*) AS `count` FROM Author")->one()['count'];
     }
     
     public function numberOfMissions()
@@ -153,7 +163,7 @@ class DatabaseModel
         $r = array();
         $joins = array();
         $groupby = array();
-        $fields = array("Mission.*", "Author.name AS `authorname`", "Author.userid AS `authoruid`", "COUNT(Author.id) <> 1 AS `multiauthor`");
+        $fields = array("Mission.*", "IFNULL(User.username, Author.name) AS `authorname`", "Author.userid AS `authoruid`");
         $table = "Mission";
         if (!empty($params["favs"])) {
             $table = "Favorite";
@@ -161,7 +171,9 @@ class DatabaseModel
             $r[] = $params["favs"];
             $joins[] = "JOIN Mission ON Favorite.mission = Mission.id";
         }
-        $joins[] = "LEFT JOIN Author ON Mission.id = Author.mission";
+        $joins[] = "LEFT JOIN MissionAuthor ON Mission.id = MissionAuthor.mission";
+        $joins[] = "JOIN Author ON MissionAuthor.author = Author.id";
+        $joins[] = "LEFT JOIN User ON Author.userid = User.id";
         $groupby[] = "GROUP BY Mission.id";
         $query = "FROM " . $table . " ";
         if (!empty($params["q"])) {
@@ -173,12 +185,20 @@ class DatabaseModel
             $r[] = $params["user"];
         }
         if (!empty($params["author"])) {
-            $wheres[] = "Author.name LIKE ?";
+            $wheres[] = "User.username LIKE ? OR Author.name LIKE ?";
             $r[] = prepareSearch($params["author"]);
-        }
-        if (!empty($params["authorid"])) {
-            $wheres[] = "Author.userid = ?";
+            $r[] = prepareSearch($params["author"]);
+            $fields[] = "(SELECT COUNT(MissionAuthor.author) <> 1 FROM MissionAuthor WHERE MissionAuthor.mission = Mission.id) AS `multiauthor`";
+        } elseif (!empty($params["authorid"])) {
+            $wheres[] = "Author.id = ?";
             $r[] = $params["authorid"];
+            $fields[] = "(SELECT COUNT(MissionAuthor.author) <> 1 FROM MissionAuthor WHERE MissionAuthor.mission = Mission.id) AS `multiauthor`";
+        } elseif (!empty($params["authoruserid"])) {
+            $wheres[] = "Author.userid = ?";
+            $r[] = $params["authoruserid"];
+            $fields[] = "(SELECT COUNT(MissionAuthor.author) <> 1 FROM MissionAuthor WHERE MissionAuthor.mission = Mission.id) AS `multiauthor`";
+        } else {
+            $fields[] = "COUNT(Author.id) <> 1 AS `multiauthor`";
         }
         if (!empty($params["players"])) {
             $wheres[] = "Mission.playersMin <= ?";
@@ -265,6 +285,51 @@ class DatabaseModel
                 if ($givenorder === "jdate") {
                     $orderby = "User.joined";
                 } // else = name
+            }
+        }
+        $query .= implode(" ", $joins) . " ";
+        if (!empty($wheres)) {
+            $query .= "WHERE " . implode(" AND ", $wheres) . " ";
+        }
+
+        $tmpr = array_merge(array("SELECT COUNT(*) AS `count` " . $query), $r);
+        $total = call_user_func_array(array($this->db, "query"), $tmpr)->one()['count'];
+
+        $query .= "ORDER BY $orderby $orderad ";
+        $query =  "SELECT " . implode(", ", $fields) . " " . $query;
+        if (!empty($params["page"])) {
+            $page = intval($params["page"]);
+            if ($page > 0) {
+                $page = $page - 1;
+            }
+            $query .= "LIMIT ? OFFSET ?";
+            $r[] = PERPAGE;
+            $r[] = PERPAGE * $page;
+        }
+        array_unshift($r, $query);
+        return call_user_func_array(array($this->db, "query"), $r)->all();
+    }
+
+    public function searchAuthors(array $params, int &$total = null)
+    {
+        $wheres = array();
+        $r = array();
+        $joins = array("LEFT JOIN User ON Author.userid = User.id");
+        $fields = array("Author.id AS `id`", "Author.userid AS `userid`", "IFNULL(User.username, Author.`name`) AS `name`");
+        $table = "Author";
+        $query = "FROM " . $table . " ";
+        if (!empty($params["q"])) {
+            $wheres[] = "Author.name LIKE ? OR User.username LIKE ?";
+            $r[] = prepareSearch($params["q"]);
+            $r[] = prepareSearch($params["q"]);
+        }
+        $orderby = "`name`";
+        $orderad = "ASC";
+        $desc = false;
+        if (!empty($params["order"])) {
+            $givenorder = parseSearchOrder($params["order"], $desc);
+            if (!is_null($givenorder)) {
+                $orderad = $desc ? "DESC" : "ASC";
             }
         }
         $query .= implode(" ", $joins) . " ";

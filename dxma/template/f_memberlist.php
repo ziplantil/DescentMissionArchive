@@ -1,7 +1,7 @@
 <?php if (!defined('DXMA_VERSION')) {
     die();
 } ?>
-<table class="missionlist resulttable">
+<table class="memberlist resulttable">
     <tr>
         <th>User</th>
         <th>Name</th>

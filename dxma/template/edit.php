@@ -30,14 +30,14 @@ if (!$logged_in) {
                 $lines = array();
                 foreach ($mission["authors"] as &$author) {
                     if (!is_null($author["userid"])) {
-                        $lines[] = "@" . $author["name"];
-                    } else {
                         $lines[] = $author["name"];
+                    } else {
+                        $lines[] = "#" . $author["name"];
                     }
                 }
                 echo(implode("\n", $lines));
             ?></textarea><br />
-            One author per line. Prefix line by @ if a DXMA username</td>
+            One author per line. Prefix line by # if <i>not</i> a DXMA username</td>
         </tr>
         <tr>
             <th><label for="mode">Mode:</label></th>
