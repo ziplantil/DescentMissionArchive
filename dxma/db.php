@@ -31,6 +31,8 @@ class DatabaseConnection
             return 'd';
         } elseif (is_int($var)) {
             return 'i';
+        } elseif (is_null($var)) {
+            return 's';
         } else {
             return 'b';
         }

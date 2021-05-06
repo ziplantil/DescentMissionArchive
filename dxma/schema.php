@@ -133,7 +133,10 @@ COMMIT
     );
     $migr = $db->query("SELECT * FROM AuthorOld")->all();
     foreach ($migr as &$result) {
-        $aid = $db->query("SELECT Author.id FROM Author WHERE Author.`name` = ? AND Author.`userid` = ?", $result["name"], $result["userid"])->one();
+        if (is_null($result["userid"]))
+            $aid = $db->query("SELECT Author.id FROM Author WHERE Author.`name` = ?", $result["name"])->one();
+        else
+            $aid = $db->query("SELECT Author.id FROM Author WHERE Author.`userid` = ?", $result["userid"])->one();
         if (!is_null($aid)) {
             $aid = $aid["id"];
         } else {

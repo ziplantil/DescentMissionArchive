@@ -1,5 +1,7 @@
 <?php
-if (!defined('I_AM_DXMA')) die();
+if (!defined('I_AM_DXMA')) {
+    die();
+}
 
 // root path of frontend (without trailing slash)
 // the path must be visible to the web browser
@@ -22,7 +24,7 @@ define('MAXIMGSIZE', 10 * MB);
 // make sure to also adjust PHP max upload size!
 
 // whether new account registrations are allowed
-define('ALLOW_REGISTRATIONS', TRUE);
+define('ALLOW_REGISTRATIONS', true);
 
 // results per page
 define('PERPAGE', 25);
@@ -44,7 +46,7 @@ define('PUBLIC_URL', 'https://example.com/dxma/');
 define('CAN_EMAIL', FALSE);
 
 // max length for description
-define('DESC_MAXLENGTH', 2000);
+define('DESC_MAXLENGTH', 5000);
 
 // allowed file extensions for missions
 define('ALLOWED_MISSION_EXTS', ['.zip', '.7z', '.rar', '.gz', '.bz2']);
@@ -67,5 +69,3 @@ define('REGISTER_CHECKS', [
 ]);
 
 define('DEBUG', 0);
-
-?>

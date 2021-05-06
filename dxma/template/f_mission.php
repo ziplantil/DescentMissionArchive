@@ -7,6 +7,6 @@
     <td nowrap class="column-title"><a href="<?= route("mission", [ "m" => $m['id'] ]) ?>"><?= htmlspecialchars($m['title']) ?></a></td>
     <td nowrap class="column-date"><?= htmlspecialchars(formatDateTime($m['updated'])) ?></td>
     <td nowrap class="column-user"><?=
-    $m["multiauthor"] ? "<i>(multiple)</i>" : fragment("author", ["name" => $m["authorname"], "userid" => $m["authoruid"]])
+    $m["multiauthor"] ? "<i>(multiple)</i>" : fragment("author", ["name" => $m["authorname"], "id" => $m["authorid"], "userid" => $m["authoruid"]])
     ?></td>
 </tr>

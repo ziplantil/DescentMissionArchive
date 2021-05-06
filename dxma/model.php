@@ -163,7 +163,7 @@ class DatabaseModel
         $r = array();
         $joins = array();
         $groupby = array();
-        $fields = array("Mission.*", "IFNULL(User.username, Author.name) AS `authorname`", "Author.userid AS `authoruid`");
+        $fields = array("Mission.*", "IFNULL(User.username, Author.name) AS `authorname`", "Author.id AS `authorid`", "Author.userid AS `authoruid`");
         $table = "Mission";
         if (!empty($params["favs"])) {
             $table = "Favorite";
