@@ -1,7 +1,7 @@
 <?php if (!defined('DXMA_VERSION')) {
     die();
 }
-if ($logged_in) {
+if (!$logged_in) {
     redirect(route());
 } ?>
 <h2>Your favorites (<?= $total ?>)</h2>
