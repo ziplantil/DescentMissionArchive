@@ -38,6 +38,9 @@ if (!$logged_in) {
             <td colspan="2">Use the form below to change the password, or leave it empty to keep as is. You must enter the current password in order to change to a new one.</td>
         </tr>
         <tr>
+            <td colspan="2"><b>IMPORTANT!</b> You must also enter your current password if you change your email. Leave the other two fields blank if you do not want to change your password.</td>
+        </tr>
+        <tr>
             <td colspan="2"><br></td>
         </tr>
         <tr>

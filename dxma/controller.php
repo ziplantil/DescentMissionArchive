@@ -71,6 +71,11 @@ class DatabaseController
 
     public function editUser(int $uid, array $data, $auth)
     {
+        $oldUser = $this->model->getUserById($uid);
+        if (is_null($oldUser)) {
+            return $this->fail("bad request");
+        }
+
         $realname = $data["realname"];
         if (empty($realname)) {
             $realname = $username;
@@ -88,7 +93,13 @@ class DatabaseController
             $desc = "";
         }
 
+        $email = trim($email);
+        $emailChanged = $email !== $oldUser["email"];
         $arr = array();
+
+        if ($emailChanged && !$auth->checkPassword($uid, $data["cpass"] ?? "")) {
+            return $this->fail("wrong current password for e-mail change (did you enter it?)");
+        }
 
         if (!empty($data["upass"])) {
             if ($data["upass"] !== ($data["upassc"] ?? "")) {
