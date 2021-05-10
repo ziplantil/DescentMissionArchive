@@ -70,7 +70,7 @@ class DescentMissionArchive
         if (!empty($_GET["order"])) {
             $array["order"] = $_GET["order"];
         } else {
-            $array["order"] = "udate_d";
+            $array["order"] = empty($_GET['q']) ? "udate_d" : "name_a";
         }
         $missions = $this->model->searchMissions($array, $total);
         $this->serve("list", $title, array("missions" => $missions, "total" => $total, "pageNum" => $pagenum, "pageCount" => ceil($total / PERPAGE)));

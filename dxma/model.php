@@ -17,6 +17,15 @@ function prepareSearch(string $q)
     return $q;
 }
 
+function prepareSearchAny(string $q)
+{
+    if (strpos($q, "*") !== false) {
+        return prepareSearch($q);
+    } else {
+        return prepareSearch("*" . $q . "*");
+    }
+}
+
 function parseSearchOrder(string $q, bool &$desc)
 {
     if (preg_match('/([a-z]+)_([ad])/', $q, $matches) !== 1) {
@@ -178,7 +187,7 @@ class DatabaseModel
         $query = "FROM " . $table . " ";
         if (!empty($params["q"])) {
             $wheres[] = "Mission.title LIKE ?";
-            $r[] = prepareSearch("*" . $params["q"] . "*");
+            $r[] = prepareSearchAny($params["q"]);
         }
         if (!empty($params["user"])) {
             $wheres[] = "Mission.user = ?";
