@@ -285,10 +285,12 @@ class DatabaseController
         $this->db->begin();
 
         $uids = array();
+        $anames = array();
         foreach ($authors as &$pair) {
             if ($pair[0] === true) {
                 $uid = $this->model->getUserByName($pair[1]);
                 if ($uid === null) {
+                    $this->db->abort();
                     return $this->fail("No user by name '" . $pair[1] . "' exists");
                 }
                 $pair[0] = $uid["id"];
@@ -297,6 +299,16 @@ class DatabaseController
                     return $this->fail("Cannot have dupe author!");
                 }
                 $uids[$pair[0]] = true;
+            } else {
+                if (empty($pair[1])) {
+                    $this->db->abort();
+                    return $this->fail("Cannot have empty author!");
+                }
+                if (isset($anames[$pair[1]])) {
+                    $this->db->abort();
+                    return $this->fail("Cannot have dupe author!");
+                }
+                $anames[$pair[1]] = true;
             }
         }
 
@@ -451,6 +463,7 @@ class DatabaseController
             if ($pair[0] === true) {
                 $uid = $this->model->getUserByName($pair[1]);
                 if ($uid === null) {
+                    $this->db->abort();
                     return $this->fail("No user by name '" . htmlspecialchars($pair[1]) . "' exists");
                 }
                 $pair[0] = $uid["id"];
@@ -459,6 +472,16 @@ class DatabaseController
                     return $this->fail("Cannot have dupe author!");
                 }
                 $uids[$pair[0]] = true;
+            } else {
+                if (empty($pair[1])) {
+                    $this->db->abort();
+                    return $this->fail("Cannot have empty author!");
+                }
+                if (isset($anames[$pair[1]])) {
+                    $this->db->abort();
+                    return $this->fail("Cannot have dupe author!");
+                }
+                $anames[$pair[1]] = true;
             }
         }
 

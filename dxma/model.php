@@ -222,9 +222,9 @@ class DatabaseModel
                 $orderad = $desc ? "DESC" : "ASC";
 
                 if ($givenorder === "rdate") {
-                    $orderby = "Mission.released $orderad";
+                    $orderby = "Mission.released $orderad, Mission.title ASC";
                 } elseif ($givenorder === "udate") {
-                    $orderby = "Mission.updated $orderad";
+                    $orderby = "Mission.updated $orderad, Mission.title ASC";
                 } elseif ($givenorder === "rating") {
                     $divisor = 8;
                     $fields[] = "CASE WHEN COUNT(Rating.rating) = 0 THEN 0 ELSE SUM(Rating.rating - 5) / $divisor * (EXP(COUNT(Rating.rating)) - EXP(-COUNT(Rating.rating))) / (EXP(COUNT(Rating.rating)) + EXP(-COUNT(Rating.rating))) END AS score";

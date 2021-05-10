@@ -11,8 +11,9 @@
         <tr>
             <th>Order</th>
             <td>
-                <select name="order" id="order" form="searchform" required value="<?= htmlspecialchars($_GET['order'] ?? '') ?>">
-                    <option value="name_a" <?= "name_a" === ($_GET['order'] ?? '') || empty($_GET['order']) ? "selected" : "" ?>>Name (ascending)</option>
+                <select name="order" id="order" form="searchform" value="<?= htmlspecialchars($_GET['order'] ?? '') ?>">
+                    <option value="" <?= empty($_GET['order']) ? "selected" : "" ?>>(default)</option>
+                    <option value="name_a" <?= "name_a" === ($_GET['order'] ?? '') ? "selected" : "" ?>>Name (ascending)</option>
                     <option value="name_d" <?= "name_d" === ($_GET['order'] ?? '') ? "selected" : "" ?>>Name (descending)</option>
                     <option value="jdate_a" <?= "jdate_a" === ($_GET['order'] ?? '') ? "selected" : "" ?>>Join date (oldest first)</option>
                     <option value="jdate_d" <?= "jdate_d" === ($_GET['order'] ?? '') ? "selected" : "" ?>>Join date (newest first)</option>
