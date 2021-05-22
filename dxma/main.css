@@ -122,3 +122,6 @@ table.resulttable {
     width: 40em;
     height: 10em;
 }
+.pre-wrap {
+    white-space: pre-wrap;
+}

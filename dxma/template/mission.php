@@ -102,5 +102,5 @@
 </table>
 <?php if (!empty($m["description"])) : ?>
 <h2>Mission notes</h2>
-<pre><?= $m["description"] ?></pre>
+<pre class="pre-wrap"><?= $m["description"] ?></pre>
 <?php endif; ?>

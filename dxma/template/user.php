@@ -18,7 +18,7 @@
     <?php if (!empty($u["description"])) : ?>
     <tr>
         <th>Description</th>
-        <td><pre><?= htmlspecialchars($u["description"]) ?></pre></td>
+        <td><pre class="pre-wrap"><?= htmlspecialchars($u["description"]) ?></pre></td>
     </tr>
     <?php endif; ?>
 </table>
