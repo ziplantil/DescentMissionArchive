@@ -288,12 +288,12 @@ class DatabaseController
         $anames = array();
         foreach ($authors as &$pair) {
             if ($pair[0] === true) {
-                $uid = $this->model->getUserByName($pair[1]);
-                if ($uid === null) {
+                $ouid = $this->model->getUserByName($pair[1]);
+                if ($ouid === null) {
                     $this->db->abort();
                     return $this->fail("No user by name '" . $pair[1] . "' exists");
                 }
-                $pair[0] = $uid["id"];
+                $pair[0] = $ouid["id"];
                 if (!is_null($pair[0]) && isset($uids[$pair[0]])) {
                     $this->db->abort();
                     return $this->fail("Cannot have dupe author!");
@@ -461,12 +461,12 @@ class DatabaseController
         $uids = array();
         foreach ($authors as &$pair) {
             if ($pair[0] === true) {
-                $uid = $this->model->getUserByName($pair[1]);
-                if ($uid === null) {
+                $ouid = $this->model->getUserByName($pair[1]);
+                if ($ouid === null) {
                     $this->db->abort();
                     return $this->fail("No user by name '" . htmlspecialchars($pair[1]) . "' exists");
                 }
-                $pair[0] = $uid["id"];
+                $pair[0] = $ouid["id"];
                 if (!is_null($pair[0]) && isset($uids[$pair[0]])) {
                     $this->db->abort();
                     return $this->fail("Cannot have dupe author!");
