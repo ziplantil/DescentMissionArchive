@@ -110,7 +110,7 @@ COMMIT
 $migrations[4] = function ($db) {
     $db->migrateQuery(
         <<<'COMMIT'
-    ALTER TABLE Author DROP INDEX idx_author_mission;
+    ALTER TABLE Author RENAME INDEX idx_author_mission TO idx_author_old_mission;
     RENAME TABLE Author TO AuthorOld;
 
     CREATE TABLE IF NOT EXISTS `Author` (

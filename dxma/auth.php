@@ -12,9 +12,9 @@ class AuthSystem
 {
     protected $model;
     protected $ctrl;
-    public $ok;
-    public $uid;
-    public $uname;
+    public bool $ok;
+    public int $uid;
+    public string $uname;
     public $user;
     public $error;
 
@@ -33,6 +33,7 @@ class AuthSystem
             $expires = $_SESSION['login_expires'];
             $valid = $valid && $now < $expires;
         }
+        $uname = "";
         if ($valid) {
             $user = $this->model->getUserByIdLite($_SESSION['login_uid']);
             $valid = $valid && ($user !== null);
@@ -47,8 +48,8 @@ class AuthSystem
             $this->uname = $uname;
         } else {
             $this->ok = false;
-            $this->uid = null;
-            $this->uname = null;
+            $this->uid = -1;
+            $this->uname = "";
         }
     }
 
@@ -126,7 +127,7 @@ class AuthSystem
 
         $forgotcode = bin2hex(random_bytes(16));
         if (!$this->ctrl->setUpForgot($user["id"], $forgotcode)) {
-            return fail($this->ctrl->error);
+            return $this->fail($this->ctrl->error);
         }
 
         $link = PUBLIC_URL . "forgot/?" . http_build_query([ "u" => $user["id"], "t" => $forgotcode ]);
@@ -141,7 +142,7 @@ class AuthSystem
         return true;
     }
 
-    public function changePassword(string $uid, string $upass)
+    public function changePassword(int $uid, string $upass)
     {
         if (strlen($upass) > 256) {
             return $this->fail("password is too long");

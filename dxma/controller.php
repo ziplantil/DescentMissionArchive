@@ -78,7 +78,7 @@ class DatabaseController
 
         $realname = $data["realname"];
         if (empty($realname)) {
-            $realname = $username;
+            $realname = $oldUser["username"];
         }
         $email = $data["email"];
         if (empty($email)) {
@@ -368,8 +368,8 @@ class DatabaseController
             return $this->fail("Could not add mission");
         }
 
-        renameOrMerge(getMissionFilePath($uid, $tempdir), getMissionFilePath($uid, $mid));
-        renameOrMerge(getScreenshotFilePath($uid, $tempdir), getScreenshotFilePath($uid, $mid));
+        renameOrMerge(getMissionFilePath($uid, $tempdir), getMissionFilePath($uid, strval($mid)));
+        renameOrMerge(getScreenshotFilePath($uid, $tempdir), getScreenshotFilePath($uid, strval($mid)));
         $this->db->commit();
         return $mid;
     }
@@ -459,6 +459,7 @@ class DatabaseController
         $this->db->begin();
 
         $uids = array();
+        $anames = array();
         foreach ($authors as &$pair) {
             if ($pair[0] === true) {
                 $ouid = $this->model->getUserByName($pair[1]);
@@ -563,8 +564,8 @@ class DatabaseController
             return $this->fail("Not permitted");
         }
 
-        $fpathold = getMissionFilePath($uid, $mid, $mission['filename']);
-        $fpath = getMissionFilePath($uid, $mid, $fname);
+        $fpathold = getMissionFilePath($uid, strval($mid), $mission['filename']);
+        $fpath = getMissionFilePath($uid, strval($mid), $fname);
         if (!move_uploaded_file($data['tmp_name'], $fpath)) {
             return $this->fail("Could not upload mission file");
         }
@@ -616,8 +617,8 @@ class DatabaseController
         }
 
         $hadscreenshot = !is_null($mission['screenshot']);
-        $fpathold = getScreenshotFilePath($uid, $mid, $mission['screenshot']);
-        $fpath = getScreenshotFilePath($uid, $mid, $fname);
+        $fpathold = getScreenshotFilePath($uid, strval($mid), $mission['screenshot']);
+        $fpath = getScreenshotFilePath($uid, strval($mid), $fname);
         if (!move_uploaded_file($data['tmp_name'], $fpath)) {
             return $this->fail("Could not upload screenshot file");
         }
@@ -649,7 +650,7 @@ class DatabaseController
             return true;
         }
 
-        $spath = getScreenshotFilePath($uid, $mid, $mission['filename']);
+        $spath = getScreenshotFilePath($uid, strval($mid), $mission['filename']);
         $ok = $this->db->execute("UPDATE Mission SET screenshot=NULL WHERE id=?", $mid);
         if ($ok) {
             unlink($spath);
@@ -667,10 +668,10 @@ class DatabaseController
             return $this->fail("Not permitted");
         }
 
-        $fpath = getMissionFilePath($uid, $mid, $mission['filename']);
+        $fpath = getMissionFilePath($uid, strval($mid), $mission['filename']);
         $spath = null;
         if (!empty($mission['screenshot'])) {
-            $spath = getScreenshotFilePath($uid, $mid, $mission['filename']);
+            $spath = getScreenshotFilePath($uid, strval($mid), $mission['filename']);
         }
         $ok = $this->db->execute("DELETE FROM Mission WHERE id=?", $mid);
         if ($ok) {

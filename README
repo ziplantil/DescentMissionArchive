@@ -1,10 +1,14 @@
 DXMA (Descent Mission Archive; X standing in for 1, 2, 3, etc.) is a PHP web application that
 provides an interface for uploading and searching mission files for Descent games (as well as Overload).
 
-The program requires PHP 7 as well as MySQL (with InnoDB or a compatible storage engine). When installed,
-the application should be configured by modifying config.php (under config) under the config folder.
-You may also want to look at about.php (under config) and replace its content with whatever you want,
-and add a noimg.png under the dxma folder as a placeholder for missions without a screenshot.
+The program requires at least PHP 7.4 as well as MySQL (with InnoDB or
+a compatible storage engine), or MariaDB.
+When installed, the application should be configured by modifying config.php (under config) under
+the config folder. You may also want to look at about.php (under config) and replace its content
+with whatever you want, and add a noimg.png under the dxma folder as a placeholder for missions
+without a screenshot.
+
+The MySQLi PHP extension must also be available.
 
 The code is not the best or cleanest I have written, but it does the job. It follows a
 quasi-MVC structure and uses PHP itself as a templating engine.

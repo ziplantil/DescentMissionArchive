@@ -47,6 +47,9 @@ class DatabaseModel
     
     public function version()
     {
+        if (!$this->db->query("SHOW TABLES LIKE 'SchemaVersion'")->exists()) {
+            return null;
+        }
         $result = $this->db->query("SELECT version FROM SchemaVersion")->one();
         $this->has_version = !is_null($result);
         return is_null($result) ? null : $result["version"];
@@ -166,7 +169,7 @@ class DatabaseModel
         return array("count" => count($ratings), "average" => count($scores) > 0 ? array_sum($scores) / count($scores) : null, "you" => $you);
     }
 
-    public function searchMissions(array $params, int &$total = null)
+    public function searchMissions(array $params, ?int &$total = null)
     {
         $wheres = array();
         $r = array();
@@ -271,7 +274,7 @@ class DatabaseModel
         return call_user_func_array(array($this->db, "query"), $r)->all();
     }
 
-    public function searchMembers(array $params, int &$total = null)
+    public function searchMembers(array $params, ?int &$total = null)
     {
         $wheres = array();
         $r = array();
@@ -319,7 +322,7 @@ class DatabaseModel
         return call_user_func_array(array($this->db, "query"), $r)->all();
     }
 
-    public function searchAuthors(array $params, int &$total = null)
+    public function searchAuthors(array $params, ?int &$total = null)
     {
         $wheres = array();
         $r = array();

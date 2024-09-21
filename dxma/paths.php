@@ -42,7 +42,7 @@ function renameOrMerge(string $src, string $dst)
     }
 }
 
-function getMissionFilePath(string $uid, string $name, string $fn = null)
+function getMissionFilePath(int $uid, string $name, ?string $fn = null)
 {
     $path = FILEPATH . DIRECTORY_SEPARATOR . "f" . DIRECTORY_SEPARATOR . strval($uid) . DIRECTORY_SEPARATOR . $name;
     createIfNotExist($path);
@@ -52,7 +52,7 @@ function getMissionFilePath(string $uid, string $name, string $fn = null)
     return $path;
 }
 
-function getScreenshotFilePath(string $uid, string $name, string $fn = null)
+function getScreenshotFilePath(int $uid, string $name, ?string $fn = null)
 {
     $path = FILEPATH . DIRECTORY_SEPARATOR . "img" . DIRECTORY_SEPARATOR . strval($uid) . DIRECTORY_SEPARATOR . $name;
     createIfNotExist($path);
@@ -62,7 +62,7 @@ function getScreenshotFilePath(string $uid, string $name, string $fn = null)
     return $path;
 }
 
-function getMissionFileURL(string $uid, string $name, string $fn = null)
+function getMissionFileURL(int $uid, string $name, ?string $fn = null)
 {
     $path = FILEURL . "/f/" . strval($uid) . "/" . $name;
     if (!is_null($fn)) {
@@ -71,7 +71,7 @@ function getMissionFileURL(string $uid, string $name, string $fn = null)
     return $path;
 }
 
-function getScreenshotFileURL(string $uid, string $name, string $fn = null)
+function getScreenshotFileURL(int $uid, string $name, ?string $fn = null)
 {
     $path = FILEURL . "/img/" . strval($uid) . "/" . $name;
     if (!is_null($fn)) {
@@ -82,7 +82,7 @@ function getScreenshotFileURL(string $uid, string $name, string $fn = null)
 
 function formatFileSize(int $size)
 {
-    $base = floor(log($size) / log(1024));
+    $base = min(intval(floor(log($size) / log(1024))), 4);
     $suffix = array("B", "kB", "MB", "GB", "TB")[$base];
     return number_format($size / pow(1024, $base), 1) . " " . $suffix;
 }

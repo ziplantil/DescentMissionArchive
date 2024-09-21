@@ -37,8 +37,8 @@ class DescentMissionArchive
     public function serve(string $page, string $title, array $data)
     {
         $logged_in = $this->auth->ok;
-        $userid = $this->auth->uid;
-        $username = $this->auth->uname;
+        $userid = $logged_in ? $this->auth->uid : null;
+        $username = $logged_in ? $this->auth->uname : null;
         extract($data);
         $content = "$page.php";
         require "template/frame.php";
@@ -47,8 +47,8 @@ class DescentMissionArchive
     public function serveError(string $page)
     {
         $logged_in = $this->auth->ok;
-        $userid = $this->auth->uid;
-        $username = $this->auth->uname;
+        $userid = $logged_in ? $this->auth->uid : null;
+        $username = $logged_in ? $this->auth->uname : null;
         require "template/$page.php";
     }
 
@@ -134,15 +134,16 @@ class DescentMissionArchive
         $i = rand(0, count(REGISTER_CHECKS) - 1);
         $check = array("checkkey" => $i, "checkquestion" => REGISTER_CHECKS[$i][0]);
         if (hasAllPost('uid', 'ticket', 'upass', 'upassc')) {
+            $uid = intval($_POST['uid']);
             $this->checkCSRF();
-            if (!$this->model->forgotAllowed($_POST['uid'], $_POST['ticket'])) {
+            if (!$this->model->forgotAllowed($uid, $_POST['ticket'])) {
                 $this->serveError('403');
                 die();
             }
-            if ($this->ctrl->setPassword($_POST['uid'], arrayget($_POST, 'upass', 'upassc'), $this->auth)) {
+            if ($this->ctrl->setPassword($uid, arrayget($_POST, 'upass', 'upassc'), $this->auth)) {
                 $this->serve("forgotsetok", $title, array());
             } else {
-                $this->serve("forgotnewpass", $title, array("uid" => $_POST['uid'], "ticket" => $_POST['ticket'], "error" => $this->ctrl->error));
+                $this->serve("forgotnewpass", $title, array("uid" => $uid, "ticket" => $_POST['ticket'], "error" => $this->ctrl->error));
             }
         } elseif (hasAllGet('u', 't')) {
             if (!$this->model->forgotAllowed($_GET['u'], $_GET['t'])) {
@@ -453,7 +454,7 @@ class DescentMissionArchive
         
         if (!empty($_POST["rating"])) {
             $this->checkCSRF();
-            $this->ctrl->setRating($this->auth->uid, $mid, $_POST["rating"]);
+            $this->ctrl->setRating($this->auth->uid, $mid, intval($_POST["rating"]));
         } elseif (isset($_POST["delete"])) {
             $this->checkCSRF();
             $this->ctrl->deleteRating($this->auth->uid, $mid);
